@@ -127,6 +127,22 @@ def setup_scheduler(app):
         scheduler.add_job(check_expiries, "interval", hours=6)
         scheduler.start()
 
-    @app.before_first_request
-    def init_scheduler():
-        pass
+
+from apscheduler.schedulers.background import BackgroundScheduler
+
+scheduler = None
+
+def setup_scheduler(app):
+    global scheduler
+
+    if scheduler is None:
+        scheduler = BackgroundScheduler()
+        scheduler.add_job(check_expiries, "interval", hours=6)
+        scheduler.start()
+
+    # Flask 3.0 non ha più before_first_request.
+    # Quindi NON serve nessun decorator.
+    # Basta lasciare questa funzione vuota.
+    return
+
+
