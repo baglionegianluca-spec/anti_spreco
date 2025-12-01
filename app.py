@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session
 from datetime import date, timedelta
 import os
 from scheduler import setup_scheduler
-from db import init_db, get_db, add_product, get_all_products
+from db import get_db, add_product, get_all_products
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -406,7 +406,6 @@ def delete_product(product_id):
 # Quando il file viene importato (es. da gunicorn su Render)
 # inizializziamo subito il DB e lo scheduler
 
-init_db()
 setup_scheduler(app)
 
 if __name__ == "__main__":
