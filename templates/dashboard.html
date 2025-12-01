@@ -1,0 +1,112 @@
+
+{% extends "base.html" %}
+{% block content %}
+
+<h1 style="
+    font-weight:800; 
+    font-size:32px; 
+    text-align:center; 
+    margin-top:10px;
+    margin-bottom:5px;
+">
+    🥫 Anti Spreco
+</h1>
+
+<p style="text-align:center; color:#6e6e73; margin-top:-5px;">
+    Gestisci i tuoi prodotti e tieni d’occhio le scadenze
+</p>
+
+
+<div class="dashboard-grid">
+
+    <a href="/products" class="dashboard-card">
+        <div class="card-title">Totale prodotti</div>
+        <div class="card-number">{{ stats.total }}</div>
+    </a>
+
+    <a href="/products?filter=soon" class="dashboard-card">
+        <div class="card-title">In scadenza</div>
+        <div class="card-number">{{ stats.soon }}</div>
+    </a>
+
+    <a href="/products?filter=expired" class="dashboard-card">
+        <div class="card-title">Scaduti</div>
+        <div class="card-number">{{ stats.expired }}</div>
+    </a>
+
+    <a href="/products?filter=fresh" class="dashboard-card">
+        <div class="card-title">Freschi</div>
+        <div class="card-number">{{ stats.fresh }}</div>
+    </a>
+
+</div>
+
+
+<style>
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+    padding: 20px 10px;
+}
+
+.dashboard-card {
+    background: white;
+    padding: 20px;
+    border-radius: 25px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    text-decoration: none;
+    color: black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 150px;
+    transition: 0.2s;
+}
+
+.dashboard-card:active {
+    transform: scale(0.96);
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #6e6e73;
+}
+
+.card-number {
+    font-size: 38px;
+    font-weight: 800;
+    margin-top: 10px;
+}
+
+
+/* Floating Camera Button */
+.fab {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    width: 70px;
+    height: 70px;
+    background: #00c853; 
+    border-radius: 50%;
+    box-shadow: 0px 6px 20px rgba(0,0,0,0.25);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: 0.2s;
+}
+
+.fab:active {
+    transform: scale(0.92);
+}
+
+.fab-emoji {
+    font-size: 34px;
+    line-height: 1;
+}
+</style>
+
+{% endblock %}

@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1 class="page-title">{{ title }}</h1>
+
+<!-- ================================ -->
+<!--     FILTRI + RICERCA iOS         -->
+<!-- ================================ -->
+
+<div class="filters-container">
+    <div class="filters">
+        <a href="/products" class="filter {% if title == 'Tutti i prodotti' %}active{% endif %}">Tutti</a>
+        <a href="/products?filter=soon" class="filter {% if title == 'In scadenza' %}active{% endif %}">Scadenza</a>
+        <a href="/products?filter=expired" class="filter {% if title == 'Scaduti' %}active{% endif %}">Scaduti</a>
+        <a href="/products?filter=fresh" class="filter {% if title == 'Freschi' %}active{% endif %}">Freschi</a>
+    </div>
+
+    <input id="search" class="search-bar" type="text" placeholder="Cerca un prodotto...">
+</div>
+
+
+<!-- ================================ -->
+<!--          LISTA PRODOTTI          -->
+<!-- ================================ -->
+
+<div id="productList" class="products-list">
+
+{% for p in products %}
+    <div class="product-card-wrapper">
+
+        <!-- BOTTONI SWIPE (nascosti sotto) -->
+        <div class="swipe-actions">
+            <a href="/delete/{{ p.id }}" class="action-btn delete-btn">Elimina</a>
+            <a href="/add?id={{ p.id }}" class="action-btn edit-btn">Modifica</a>
+        </div>
+
+        <!-- CARD CONTENUTO -->
+        <div class="product-card swipe-element" data-name="{{ p.name|lower }}">
+
+            {% if p.image_url %}
+                <img class="product-img" src="{{ p.image_url }}">
+            {% else %}
+                <div class="product-img placeholder">🍏</div>
+            {% endif %}
+
+            <div class="product-left">
+
+                <div class="product-name">{{ p.name }}</div>
+                <div class="product-brand">{{ p.brand }}</div>
+
+                {% if p.expiry_date %}
+                    
+                    {# ---- CONVERSIONE FORMATO ISO → ITALIANO ---- #}
+                    {% set y, m, d = p.expiry_date.split("-") %}
+                    {% set italian_date = d ~ "/" ~ m ~ "/" ~ y %}
+
+                    {% if p.days_left < 0 %}
+                        <div class="expiry expired">Scaduto {{ (-p.days_left) }} gg fa</div>
+
+                    {% elif p.days_left == 0 %}
+                        <div class="expiry today">Scade oggi!</div>
+
+                    {% elif p.days_left <= 14 %}
+                        <div class="expiry soon">Tra {{ p.days_left }} giorni</div>
+
+                    {% else %}
+                        <div class="expiry fresh">{{ italian_date }}</div>
+                    {% endif %}
+
+                {% else %}
+                    <div class="expiry none">Data non disponibile</div>
+                {% endif %}
+
+            </div>
+
+            <div class="quantity">x{{ p.quantity }}</div>
+
+        </div>
+    </div>
+{% endfor %}
+
+</div>
+
+
+
+<!-- ================================ -->
+<!--               SCRIPT             -->
+<!-- ================================ -->
+
+<script>
+// 🔍 Ricerca live
+document.getElementById("search").addEventListener("input", function() {
+    let val = this.value.toLowerCase();
+    document.querySelectorAll(".product-card").forEach(card => {
+        card.style.display = card.dataset.name.includes(val) ? "flex" : "none";
+    });
+});
+
+// 👉 Swipe stile iPhone
+document.querySelectorAll(".swipe-element").forEach(card => {
+    let startX = 0;
+
+    card.addEventListener("touchstart", e => {
+        startX = e.touches[0].clientX;
+    });
+
+    card.addEventListener("touchmove", e => {
+        let diff = e.touches[0].clientX - startX;
+
+        if (diff < -40) {
+            card.classList.add("show-actions");
+        }
+        if (diff > 40) {
+            card.classList.remove("show-actions");
+        }
+    });
+});
+</script>
+
+
+<!-- ================================ -->
+<!--               STYLE              -->
+<!-- ================================ -->
+
+<style>
+
+.page-title {
+    font-weight: 700;
+    font-size: 26px;
+    padding-left: 15px;
+}
+
+/* FILTRI */
+.filters-container { padding: 10px 15px; }
+
+.filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.filter {
+    padding: 6px 14px;
+    background: #e5e5ea;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    color: black;
+}
+
+.filter.active {
+    background: #007aff;
+    color: white;
+}
+
+/* SEARCH BAR */
+.search-bar {
+    width: 100%;
+    padding: 10px 15px;
+    border-radius: 14px;
+    background: #f2f2f7;
+    border: none;
+    font-size: 16px;
+}
+
+/* LISTA */
+.products-list {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* WRAPPER SERVE PER POSIZIONARE GLI ACTION BUTTON */
+.product-card-wrapper {
+    position: relative;
+}
+
+/* BOTTONI SWIPE — NON DEVONO ESSERE VISIBILI DI DEFAULT */
+.swipe-actions {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    display: flex;
+    z-index: 1;            /* SOTTO la card */
+}
+
+.action-btn {
+    width: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    font-size: 16px;
+}
+
+.delete-btn { background: #ff3b30; }
+.edit-btn { background: #34c759; }
+
+/* CARD — VA SOPRA */
+.product-card {
+    background: white;
+    border-radius: 18px;
+    padding: 15px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    position: relative;
+    z-index: 2;             /* SOPRA le azioni */
+    transition: transform 0.25s ease;
+}
+
+/* Quando fai swipe */
+.product-card.show-actions {
+    transform: translateX(-180px); /* 2 bottoni da 90px */
+}
+
+/* FOTO */
+.product-img {
+    width: 55px;
+    height: 55px;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.placeholder {
+    background: #f2f2f7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 26px;
+}
+
+/* TESTI CARD */
+.product-left { flex: 1; }
+
+.product-name {
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.product-brand {
+    color: #6e6e73;
+    font-size: 14px;
+}
+
+.expiry {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.expiry.soon { color: #ff9500; }
+.expiry.expired { color: #ff3b30; }
+.expiry.today { color: #d60000; }
+.expiry.fresh { color: #34c759; }
+.expiry.none { color: #a0a0a5; }
+
+/* QUANTITÀ */
+.quantity {
+    font-size: 20px;
+    font-weight: 800;
+    background: #f2f2f7;
+    padding: 8px 15px;
+    border-radius: 12px;
+}
+
+</style>
+
+{% endblock %}

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+
+    <style>
+        body {
+            background: #f5f5f5;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            gap: 30px;
+        }
+
+        .btn {
+            width: 280px;
+            padding: 25px;
+            font-size: 22px;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 12px;
+            text-decoration: none;
+            color: white;
+            transition: 0.2s ease;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+
+        .btn-spreco {
+            background: #007bff;
+        }
+
+        .btn-food {
+            background: #28a745;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <a href="/anti-spreco" class="btn btn-spreco">
+    🧃 ANTI SPRECO
+    </a>
+
+
+    <a href="/food-planner" class="btn btn-food">
+        🍽 FOOD PLANNER
+    </a>
+
+</div>
+
+</body>
+</html>

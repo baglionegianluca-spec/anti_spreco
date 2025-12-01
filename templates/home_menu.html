@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Menu Principale</title>
+
+    <style>
+        body {
+            background-color: #1c1c1e;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .menu-btn {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            margin-bottom: 20px;
+            font-size: 24px;
+            border: none;
+            border-radius: 10px;
+            background-color: #2c2c2e;
+            color: white;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .menu-btn:hover {
+            background-color: #3a3a3c;
+            transform: scale(1.03);
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <a href="{{ url_for('dashboard') }}" class="menu-btn">
+        GESTIONE PRODOTTI <br> <small>(ANTI SPRECO)</small>
+    </a>
+
+    <a href="#" class="menu-btn">
+        FOOD PLANNER <br> <small>(Coming soon)</small>
+    </a>
+</div>
+
+</body>
+</html>

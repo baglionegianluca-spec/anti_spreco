@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="ios-container">
+
+    {% if image_url %}
+    <div class="image-box">
+        <img src="{{ image_url }}" alt="Immagine prodotto" class="product-image">
+    </div>
+    {% endif %}
+
+    <h2 class="title">Aggiungi Prodotto</h2>
+
+    <!-- TOP SECTION FIXATA E CENTRATA -->
+    <form method="post" class="ios-form">
+
+    <div class="top-section">
+
+        <div class="big-card">
+            <label class="big-label">Scadenza</label>
+            <input class="big-input" 
+                   type="date" 
+                   name="expiry_date"
+                   value="{{ expiry_date if expiry_date else '' }}">
+        </div>
+
+        <div class="big-card">
+            <label class="big-label">Quantità</label>
+            <input class="big-input" 
+                   type="number" 
+                   inputmode="numeric"
+                   pattern="[0-9]*"
+                   name="quantity" 
+                   value="{{ quantity }}" 
+                   min="1">
+        </div>
+
+    </div>
+
+    <form method="post" class="ios-form">
+
+        <div class="main-card">
+
+            <div class="field">
+                <label class="ios-label">Nome</label>
+                <input class="ios-input" type="text" name="name" value="{{ name }}">
+            </div>
+
+            <div class="field">
+                <label class="ios-label">Barcode</label>
+                <input class="ios-input" type="text" name="barcode" value="{{ barcode }}" readonly>
+            </div>
+
+            <div class="field">
+                <label class="ios-label">Marca</label>
+                <input class="ios-input" type="text" name="brand" value="{{ brand }}">
+            </div>
+
+            <div class="field">
+                <label class="ios-label">Categoria</label>
+                <input class="ios-input" type="text" name="category" value="{{ category }}">
+            </div>
+
+            <div class="field">
+                <label class="ios-label">Immagine URL</label>
+                <input class="ios-input" type="text" name="image_url" value="{{ image_url }}">
+            </div>
+
+        </div>
+
+        <button class="btn-primary" type="submit">Salva</button>
+    </form>
+
+</div>
+
+
+<style>
+
+/* CONTAINER GENERALE IPHONE */
+.ios-container {
+    max-width: 420px;
+    margin: auto;
+    padding: 15px;
+}
+
+/* CARD PRINCIPALE CHE CONTIENE TUTTI I CAMPI */
+.main-card {
+    width: 100%;
+    background: #ffffff;
+    padding: 18px;
+    border-radius: 22px;
+
+    /* LA SOLUZIONE: limita la larghezza interna */
+    box-sizing: border-box;          
+    overflow: hidden;                /* impedisce lo "sbordo" */
+
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+/* OGNI CAMPO INTERNO ALLA CARD */
+.field {
+    margin-bottom: 16px;
+}
+
+/* TITOLI CAMPI */
+.ios-label {
+    font-size: 14px;
+    margin-bottom: 6px;
+    display: block;
+    color: #6e6e73;
+}
+
+/* INPUT iOS: riduciamo la larghezza! */
+.ios-input {
+    width: 94%;                      /* <- FIX !!! */
+    padding: 12px;
+    border-radius: 12px;
+    background: #F2F2F7;
+    border: 1px solid #E5E5EA;
+    font-size: 16px;
+    box-sizing: border-box;          /* evita espansione */
+    margin: auto;
+}
+
+/* SEZIONE TOP (SCADENZA + QUANTITÀ) */
+.top-section {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.big-card {
+    flex: 1;
+    background: #ffffff;
+    padding: 14px;
+    border-radius: 16px;
+
+    box-sizing: border-box;
+    overflow: hidden;
+
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+.big-input {
+    width: 94%;                      /* <- FIX !!! */
+    margin-top: 8px;
+    padding: 12px;
+    font-size: 17px;
+    font-weight: 600;
+    text-align: center;
+
+    border-radius: 12px;
+    border: 1px solid #E5E5EA;
+    background: #F2F2F7;
+
+    box-sizing: border-box;
+}
+
+/* FOTO */
+.image-box {
+    background: #fff;
+    border-radius: 16px;
+    padding: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 15px;
+}
+.product-image {
+    width: 100%;
+    border-radius: 12px;
+}
+
+/* BOTTONE SALVA */
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    margin-top: 22px;
+    font-size: 18px;
+    border-radius: 14px;
+    background: #007AFF;
+    color: white;
+    font-weight: 600;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,122,255,0.30);
+}
+
+
+
+</style>
+
+{% endblock %}

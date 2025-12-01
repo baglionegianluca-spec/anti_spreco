@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: anti-spreco
+    env: python
+    plan: free
+    region: frankfurt
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"
+    envVars:
+      - key: SECRET_KEY
+        value: cambiala-questa-chiave
+      - key: APP_PASSWORD
+        value: 1234
+      - key: TELEGRAM_TOKEN
+        sync: false

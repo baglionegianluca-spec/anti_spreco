@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Scanner Codice a Barre</h2>
+
+<div id="scanner-container">
+  <video id="video" playsinline></video>
+</div>
+
+<p id="status">Inquadra un codice a barre…</p>
+
+<script src="https://unpkg.com/@zxing/library@latest"></script>
+<script src="{{ url_for('static', filename='scanner.js') }}"></script>
+
+<style>
+#scanner-container {
+  width: 100%;
+  margin-top: 20px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: black;
+}
+#video {
+  width: 100%;
+  display: block;
+}
+#status {
+  text-align: center;
+  margin-top: 14px;
+  font-size: 16px;
+  color: #333;
+}
+</style>
+
+{% endblock %}
