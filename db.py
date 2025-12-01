@@ -1,48 +1,39 @@
-import sqlite3
-from datetime import datetime
+import psycopg2
+import os
 
-DB_PATH = "data.db"
+# Recupera la variabile ambiente impostata su Render
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 def get_db():
-    conn = sqlite3.connect("data.db")
-    conn.row_factory = sqlite3.Row
-    return conn
+    return psycopg2.connect(DATABASE_URL)
 
 
-def init_db():
+def add_product(name, barcode, brand, category, image_url, quantity, expiry_date):
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS products (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            barcode TEXT,
-            brand TEXT,
-            category TEXT,
-            image_url TEXT,
-            quantity INTEGER DEFAULT 1,
-            expiry_date TEXT,
-            created_at TEXT DEFAULT (datetime('now'))
-        );
-    """)
-    conn.commit()
-    conn.close()
 
-def add_product(conn, name, barcode, brand, category, image_url, quantity, expiry_date):
-    cur = conn.cursor()
     cur.execute("""
         INSERT INTO products (name, barcode, brand, category, image_url, quantity, expiry_date)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
     """, (name, barcode, brand, category, image_url, quantity, expiry_date))
-    conn.commit()
 
-def get_all_products(conn):
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    cursor.execute("""
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+def get_all_products():
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("""
         SELECT id, name, barcode, brand, category, image_url, quantity, expiry_date
         FROM products
         ORDER BY expiry_date ASC
     """)
-    return cursor.fetchall()
 
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    return rows
