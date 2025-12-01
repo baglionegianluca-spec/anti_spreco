@@ -79,7 +79,7 @@ def dashboard():
 @login_required
 def anti_spreco_dashboard():
     conn = get_db()
-    products = get_all_products(conn)
+    products = get_all_products()
 
     today = date.today()
     total = len(products)
