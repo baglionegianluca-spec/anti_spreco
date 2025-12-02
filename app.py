@@ -7,11 +7,14 @@ from dotenv import load_dotenv
 
 # --- FOOD PLANNER IMPORT ---
 from db_foodplanner import (
-    get_all_recipes, add_recipe,
-    assign_recipe_to_day, get_week_plan,
-    remove_planned_recipe, mark_meal_done,
-    init_foodplanner_tables
+    get_all_recipes,
+    add_recipe,
+    assign_recipe,
+    get_day_plan,
+    remove_planned_recipe,
+    mark_meal_done
 )
+
 
 # Carico variabili ambiente
 load_dotenv()
