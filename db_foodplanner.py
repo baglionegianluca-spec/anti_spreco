@@ -5,12 +5,17 @@ from psycopg2.extras import RealDictCursor
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 
+# ============================
+#   CONNESSIONE AL DATABASE
+# ============================
+
 def get_db():
+    """Restituisce una connessione PostgreSQL usando RealDictCursor."""
     return psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
 
 
 # ============================
-#   CREAZIONE TABELLE (SCHEMA A)
+#   CREAZIONE TABELLE
 # ============================
 
 def init_foodplanner_tables():
@@ -27,7 +32,7 @@ def init_foodplanner_tables():
         );
     """)
 
-    # 2) Ingredienti ricette
+    # 2) Ingredienti delle ricette
     cur.execute("""
         CREATE TABLE IF NOT EXISTS recipe_ingredients (
             id SERIAL PRIMARY KEY,
@@ -147,7 +152,8 @@ def assign_recipe(day_date, meal_type, recipe_id):
         VALUES (%s, %s, %s)
         ON CONFLICT (day_date, meal_type) DO UPDATE
         SET recipe_id = EXCLUDED.recipe_id,
-            is_done = FALSE;
+            is_done = FALSE,
+            custom_note = NULL;
     """, (day_date, meal_type, recipe_id))
     conn.commit()
     conn.close()
@@ -173,5 +179,70 @@ def mark_meal_done(entry_id):
         SET is_done = TRUE
         WHERE id = %s;
     """, (entry_id,))
+    conn.commit()
+    conn.close()
+
+
+# ============================
+#   PIANO SETTIMANALE COMPLETO
+# ============================
+
+def get_week_plan():
+    """Ritorna tutte le entries del planner ordinate per giorno e pasto."""
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT mp.id,
+               mp.day_date,
+               mp.meal_type,
+               mp.custom_note,
+               mp.is_done,
+               r.id AS recipe_id,
+               r.name AS recipe_name
+        FROM meal_plan_entries mp
+        LEFT JOIN recipes r ON mp.recipe_id = r.id
+        ORDER BY mp.day_date, mp.meal_type;
+    """)
+    rows = cur.fetchall()
+    conn.close()
+    return rows
+
+
+# ============================
+#   LISTA DELLA SPESA
+# ============================
+
+def add_shopping_item(week_start, name, quantity, unit):
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO shopping_items (week_start, ingredient_name, quantity, unit)
+        VALUES (%s, %s, %s, %s);
+    """, (week_start, name, quantity, unit))
+    conn.commit()
+    conn.close()
+
+
+def get_shopping_list(week_start):
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT * FROM shopping_items
+        WHERE week_start = %s
+        ORDER BY status, ingredient_name;
+    """, (week_start,))
+    rows = cur.fetchall()
+    conn.close()
+    return rows
+
+
+def update_shopping_status(item_id, status):
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("""
+        UPDATE shopping_items
+        SET status = %s
+        WHERE id = %s;
+    """, (status, item_id))
     conn.commit()
     conn.close()
