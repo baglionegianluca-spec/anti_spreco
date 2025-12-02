@@ -86,15 +86,17 @@ def get_all_recipes():
     return rows
 
 
-def add_recipe(name, notes=None, default_servings=None):
+def add_recipe(name, ingredients):
     conn = get_db()
     cur = conn.cursor()
+
     cur.execute("""
-        INSERT INTO recipes (name, notes, default_servings)
-        VALUES (%s, %s, %s);
-    """, (name, notes, default_servings))
+        INSERT INTO recipes (name, ingredients)
+        VALUES (%s, %s)
+    """, (name, ingredients))
+
     conn.commit()
-    conn.close()
+    cur.close()
 
 
 # ============================
