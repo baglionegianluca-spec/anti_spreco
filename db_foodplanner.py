@@ -1,6 +1,7 @@
 import os
 import psycopg2
 from psycopg2.extras import RealDictCursor
+import json
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
@@ -86,17 +87,23 @@ def get_all_recipes():
     return rows
 
 
+
+
 def add_recipe(name, ingredients):
     conn = get_db()
     cur = conn.cursor()
 
+    # Trasforma gli ingredienti in JSON valido
+    json_ingredients = json.dumps(ingredients)
+
     cur.execute("""
         INSERT INTO recipes (name, ingredients)
         VALUES (%s, %s)
-    """, (name, ingredients))
+    """, (name, json_ingredients))
 
     conn.commit()
     cur.close()
+
 
 
 # ============================
