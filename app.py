@@ -449,24 +449,20 @@ def add_foodplanner():
     if request.method == "POST":
         day = request.form.get("day")
 
-        lunch_first_id = request.form.get("lunch_first_id")
-        lunch_second_id = request.form.get("lunch_second_id")
+        lunch_first = request.form.get("lunch_first") or None
+        lunch_second = request.form.get("lunch_second") or None
+        dinner_first = request.form.get("dinner_first") or None
+        dinner_second = request.form.get("dinner_second") or None
 
-        dinner_first_id = request.form.get("dinner_first_id")
-        dinner_second_id = request.form.get("dinner_second_id")
-
-        # Salva o aggiorna i campi (possono essere vuoti)
-        assign_recipe(day, "lunch_first", lunch_first_id)
-        assign_recipe(day, "lunch_second", lunch_second_id)
-        assign_recipe(day, "dinner_first", dinner_first_id)
-        assign_recipe(day, "dinner_second", dinner_second_id)
+        assign_recipe(day, lunch_first, lunch_second, dinner_first, dinner_second)
 
         return redirect(url_for("food_planner"))
 
-    days = ["lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"]
+    days = ["lunedì","martedì","mercoledì","giovedì","venerdì","sabato","domenica"]
     recipes = get_all_recipes()
 
     return render_template("planner.html", days=days, recipes=recipes)
+
 
 
 # ============================

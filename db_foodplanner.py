@@ -152,22 +152,29 @@ def get_day_plan(day_text):
 
 
 
-def assign_recipe(day_text, meal_type, first_id=None, second_id=None):
+def assign_recipe(day_text, lunch_first, lunch_second, dinner_first, dinner_second):
     conn = get_db()
     cur = conn.cursor()
 
     cur.execute("""
-        INSERT INTO meal_plan_entries (day_date, meal_type, first_course_id, second_course_id)
-        VALUES (%s, %s, %s, %s)
-        ON CONFLICT (day_date, meal_type) DO UPDATE
-        SET first_course_id = EXCLUDED.first_course_id,
-            second_course_id = EXCLUDED.second_course_id,
-            is_done = FALSE,
-            custom_note = NULL;
-    """, (day_text, meal_type, first_id, second_id))
+        INSERT INTO meal_plan_entries (
+            day_date,
+            lunch_first_recipe_id,
+            lunch_second_recipe_id,
+            dinner_first_recipe_id,
+            dinner_second_recipe_id
+        ) VALUES (%s, %s, %s, %s, %s)
+        ON CONFLICT (day_date)
+        DO UPDATE SET
+            lunch_first_recipe_id = EXCLUDED.lunch_first_recipe_id,
+            lunch_second_recipe_id = EXCLUDED.lunch_second_recipe_id,
+            dinner_first_recipe_id = EXCLUDED.dinner_first_recipe_id,
+            dinner_second_recipe_id = EXCLUDED.dinner_second_recipe_id;
+    """, (day_text, lunch_first, lunch_second, dinner_first, dinner_second))
 
     conn.commit()
     conn.close()
+
 
 
 def remove_planned_recipe(entry_id):
