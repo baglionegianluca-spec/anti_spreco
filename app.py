@@ -16,7 +16,8 @@ from db_foodplanner import (
     get_day_plan,
     remove_planned_recipe,
     mark_meal_done,
-    get_recipe_by_id
+    get_recipe_by_id,
+    delete_recipe
 )
 
 
