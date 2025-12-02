@@ -115,7 +115,7 @@
 
         <!-- PRANZO - PRIMO -->
         <label>Pranzo — Primo</label>
-        <select name="lunch_first_id">
+        <select name="lunch_first">
             <option value="">— Nessuno —</option>
             {% for r in recipes %}
             <option value="{{ r.id }}">{{ r.name }}</option>
@@ -124,7 +124,7 @@
 
         <!-- PRANZO — SECONDO -->
         <label>Pranzo — Secondo</label>
-        <select name="lunch_second_id">
+        <select name="lunch_second">
             <option value="">— Nessuno —</option>
             {% for r in recipes %}
             <option value="{{ r.id }}">{{ r.name }}</option>
@@ -133,7 +133,7 @@
 
         <!-- CENA - PRIMO -->
         <label>Cena — Primo</label>
-        <select name="dinner_first_id">
+        <select name="dinner_first">
             <option value="">— Nessuno —</option>
             {% for r in recipes %}
             <option value="{{ r.id }}">{{ r.name }}</option>
@@ -142,7 +142,7 @@
 
         <!-- CENA — SECONDO -->
         <label>Cena — Secondo</label>
-        <select name="dinner_second_id">
+        <select name="dinner_second">
             <option value="">— Nessuno —</option>
             {% for r in recipes %}
             <option value="{{ r.id }}">{{ r.name }}</option>
