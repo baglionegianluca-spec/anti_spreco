@@ -405,32 +405,32 @@ def delete_product(product_id):
 
 
 
-
 @app.route("/food-planner")
 @login_required
 def food_planner():
-    """
-    Mostra la pagina principale del planner settimanale.
-    """
-    week = get_week_plan()
-    # week ritorna qualcosa tipo:
-    # [
-    #   {"plan_id": 1, "day": "lunedì", "meal": "pranzo", "recipe_name": "Pollo"},
-    #   {"plan_id": 2, "day": "lunedì", "meal": "cena", "recipe_name": "Pasta"},
-    # ]
-    days_order = ["lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"]
+    import datetime
+    
+    # Trova il lunedì della settimana corrente
+    today = datetime.date.today()
+    monday = today - datetime.timedelta(days=today.weekday())
+    
+    days = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"]
+    week = {}
 
-    # Riorganizzo in formato leggibile per il template
-    week_struct = {d: {"pranzo": None, "cena": None} for d in days_order}
+    for i in range(7):
+        d = monday + datetime.timedelta(days=i)
+        day_plan = get_day_plan(d)
 
-    for row in week:
-        week_struct[row["day"]][row["meal"]] = {
-            "plan_id": row["plan_id"],
-            "recipe_name": row["recipe_name"]
+        # Estraggo pranzo/cena se ci sono
+        lunch = next((x["recipe_name"] for x in day_plan if x["meal_type"] == "pranzo"), "—")
+        dinner = next((x["recipe_name"] for x in day_plan if x["meal_type"] == "cena"), "—")
+
+        week[days[i]] = {
+            "lunch": lunch,
+            "dinner": dinner
         }
 
-    return render_template("food_planner.html", week=week_struct)
-
+    return render_template("food_planner.html", week=week)
 
 # ============================
 #   AGGIUNGI RICETTA A UN GIORNO
