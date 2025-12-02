@@ -5,12 +5,16 @@ from psycopg2.extras import RealDictCursor
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 
+# ============================
+#   CONNESSIONE DATABASE
+# ============================
+
 def get_db():
     return psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
 
 
 # ============================
-#   TABELLE NECESSARIE
+#   CREAZIONE TABELLE (SCHEMA A)
 # ============================
 
 def init_foodplanner_tables():
@@ -22,37 +26,47 @@ def init_foodplanner_tables():
         CREATE TABLE IF NOT EXISTS recipes (
             id SERIAL PRIMARY KEY,
             name TEXT NOT NULL,
-            ingredients TEXT NOT NULL
+            notes TEXT,
+            default_servings INTEGER
         );
     """)
 
-    # 2) Tabella planner settimanale
+    # 2) Ingredienti delle ricette
     cur.execute("""
-        CREATE TABLE IF NOT EXISTS weekly_plan (
+        CREATE TABLE IF NOT EXISTS recipe_ingredients (
             id SERIAL PRIMARY KEY,
-            day_of_week TEXT NOT NULL,
-            meal_type TEXT NOT NULL,   -- pranzo o cena
-            recipe_id INTEGER REFERENCES recipes(id),
-            done BOOLEAN DEFAULT FALSE
+            recipe_id INTEGER NOT NULL REFERENCES recipes(id) ON DELETE CASCADE,
+            ingredient_name TEXT NOT NULL,
+            quantity NUMERIC,
+            unit TEXT
         );
     """)
 
-    # Inserimento automatico giorni (solo se vuoto)
-    cur.execute("SELECT COUNT(*) FROM weekly_plan;")
-    count = cur.fetchone()["count"]
+    # 3) Pianificazione giornaliera pasti
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS meal_plan_entries (
+            id SERIAL PRIMARY KEY,
+            day_date DATE NOT NULL,
+            meal_type TEXT NOT NULL,       -- 'lunch' o 'dinner'
+            recipe_id INTEGER REFERENCES recipes(id) ON DELETE SET NULL,
+            custom_note TEXT,
+            is_done BOOLEAN DEFAULT FALSE
+        );
+    """)
 
-    if count == 0:
-        days = ["lunedì", "martedì", "mercoledì", "giovedì",
-                "venerdì", "sabato", "domenica"]
-
-        for d in days:
-            cur.execute("""
-                INSERT INTO weekly_plan (day_of_week, meal_type)
-                VALUES (%s, %s), (%s, %s)
-            """, (d, "pranzo", d, "cena"))
+    # 4) Lista della spesa
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS shopping_items (
+            id SERIAL PRIMARY KEY,
+            week_start DATE NOT NULL,
+            ingredient_name TEXT NOT NULL,
+            quantity NUMERIC,
+            unit TEXT,
+            status TEXT NOT NULL DEFAULT 'needed'
+        );
+    """)
 
     conn.commit()
-    cur.close()
     conn.close()
 
 
@@ -63,82 +77,88 @@ def init_foodplanner_tables():
 def get_all_recipes():
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("SELECT * FROM recipes ORDER BY name")
+
+    cur.execute("SELECT * FROM recipes ORDER BY name;")
     rows = cur.fetchall()
+
     conn.close()
     return rows
 
 
-def add_recipe(name, ingredients):
+def add_recipe(name, notes=None, default_servings=None):
     conn = get_db()
     cur = conn.cursor()
+
     cur.execute("""
-        INSERT INTO recipes (name, ingredients)
-        VALUES (%s, %s)
-    """, (name, ingredients))
+        INSERT INTO recipes (name, notes, default_servings)
+        VALUES (%s, %s, %s)
+    """, (name, notes, default_servings))
+
     conn.commit()
     conn.close()
 
 
 # ============================
-#   PLANNER SETTIMANALE
+#   INGREDIENTI RICETTA
 # ============================
 
-def get_week_plan():
+def add_ingredient(recipe_id, name, quantity, unit):
     conn = get_db()
     cur = conn.cursor()
-    
+
     cur.execute("""
-        SELECT w.id, w.day_of_week, w.meal_type,
-               r.id AS recipe_id, r.name AS recipe_name,
-               w.done
-        FROM weekly_plan w
-        LEFT JOIN recipes r ON w.recipe_id = r.id
-        ORDER BY w.id;
-    """)
+        INSERT INTO recipe_ingredients (recipe_id, ingredient_name, quantity, unit)
+        VALUES (%s, %s, %s, %s)
+    """, (recipe_id, name, quantity, unit))
+
+    conn.commit()
+    conn.close()
+
+
+def get_ingredients(recipe_id):
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT * FROM recipe_ingredients
+        WHERE recipe_id = %s;
+    """, (recipe_id,))
 
     rows = cur.fetchall()
     conn.close()
     return rows
 
 
-def assign_recipe_to_day(day, meal, recipe_id):
+# ============================
+#   PLANNER GIORNALIERO
+# ============================
+
+def get_day_plan(day_date):
     conn = get_db()
     cur = conn.cursor()
 
     cur.execute("""
-        UPDATE weekly_plan
-        SET recipe_id = %s, done = FALSE
-        WHERE day_of_week = %s AND meal_type = %s
-    """, (recipe_id, day, meal))
+        SELECT mp.id, mp.day_date, mp.meal_type, mp.custom_note,
+               mp.is_done,
+               r.id AS recipe_id, r.name AS recipe_name
+        FROM meal_plan_entries mp
+        LEFT JOIN recipes r ON mp.recipe_id = r.id
+        WHERE mp.day_date = %s
+        ORDER BY mp.meal_type;
+    """, (day_date,))
 
-    conn.commit()
+    rows = cur.fetchall()
     conn.close()
+    return rows
 
 
-def remove_planned_recipe(plan_id):
+def assign_recipe(day_date, meal_type, recipe_id):
     conn = get_db()
     cur = conn.cursor()
 
+    # Se non esiste la riga, la creiamo.
     cur.execute("""
-        UPDATE weekly_plan
-        SET recipe_id = NULL, done = FALSE
-        WHERE id = %s
-    """, (plan_id,))
-
-    conn.commit()
-    conn.close()
-
-
-def mark_meal_done(plan_id):
-    conn = get_db()
-    cur = conn.cursor()
-
-    cur.execute("""
-        UPDATE weekly_plan
-        SET done = TRUE
-        WHERE id = %s
-    """, (plan_id,))
-
-    conn.commit()
-    conn.close()
+        INSERT INTO meal_plan_entries (day_date, meal_type, recipe_id)
+        VALUES (%s, %s, %s)
+        ON CONFLICT (day_date, meal_type) DO UPDATE
+        SET recipe_id = EXCLUDED.recipe_id, is_done = FALSE_
