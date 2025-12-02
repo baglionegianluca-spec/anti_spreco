@@ -131,7 +131,6 @@ def delete_recipe(recipe_id):
 # ============================
 #   LETTURA PIANO DEL GIORNO
 # ============================
-
 def get_day_plan(day_text):
     conn = get_db()
     cur = conn.cursor()
@@ -148,12 +147,13 @@ def get_day_plan(day_text):
         LEFT JOIN recipes r2 ON mp.lunch_second_recipe_id = r2.id
         LEFT JOIN recipes r3 ON mp.dinner_first_recipe_id = r3.id
         LEFT JOIN recipes r4 ON mp.dinner_second_recipe_id = r4.id
-        WHERE mp.day_date = %s
+        WHERE mp.day_date = %s;
     """, (day_text,))
 
-    row = cur.fetchone()
+    result = cur.fetchone()
     conn.close()
-    return row
+    return result
+
 
 
 # ============================
