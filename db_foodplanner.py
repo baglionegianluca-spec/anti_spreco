@@ -162,19 +162,22 @@ def assign_recipe(day_text, lunch_first, lunch_second, dinner_first, dinner_seco
             lunch_first_recipe_id,
             lunch_second_recipe_id,
             dinner_first_recipe_id,
-            dinner_second_recipe_id
-        ) VALUES (%s, %s, %s, %s, %s)
-        ON CONFLICT (day_date)
-        DO UPDATE SET
+            dinner_second_recipe_id,
+            is_done,
+            custom_note
+        )
+        VALUES (%s, %s, %s, %s, %s, FALSE, NULL)
+        ON CONFLICT (day_date) DO UPDATE SET
             lunch_first_recipe_id = EXCLUDED.lunch_first_recipe_id,
             lunch_second_recipe_id = EXCLUDED.lunch_second_recipe_id,
             dinner_first_recipe_id = EXCLUDED.dinner_first_recipe_id,
-            dinner_second_recipe_id = EXCLUDED.dinner_second_recipe_id;
+            dinner_second_recipe_id = EXCLUDED.dinner_second_recipe_id,
+            is_done = FALSE,
+            custom_note = NULL;
     """, (day_text, lunch_first, lunch_second, dinner_first, dinner_second))
 
     conn.commit()
     conn.close()
-
 
 
 def remove_planned_recipe(entry_id):
