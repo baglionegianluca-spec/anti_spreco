@@ -135,25 +135,21 @@ def get_day_plan(day_text):
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT 
-            mp.id,
-            mp.meal_type,
-            mp.first_course_id,
-            mp.second_course_id,
-            r1.name AS first_course_name,
-            r2.name AS second_course_name,
-            mp.custom_note,
-            mp.is_done
-        FROM meal_plan_entries mp
-        LEFT JOIN recipes r1 ON mp.first_course_id = r1.id
-        LEFT JOIN recipes r2 ON mp.second_course_id = r2.id
-        WHERE mp.day_date = %s
-        ORDER BY mp.meal_type;
+        SELECT
+            lunch_first_recipe_id,
+            lunch_second_recipe_id,
+            dinner_first_recipe_id,
+            dinner_second_recipe_id
+        FROM meal_plan_entries
+        WHERE day_date = %s;
     """, (day_text,))
 
-    rows = cur.fetchall()
+    row = cur.fetchone()
     conn.close()
-    return rows
+    return row or {}
+
+
+
 
 
 def assign_recipe(day_text, meal_type, first_id=None, second_id=None):
