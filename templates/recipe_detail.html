@@ -53,5 +53,25 @@
     <a class="back" href="/recipes">← Torna alle ricette</a>
 </div>
 
+<form method="POST" action="/recipe/{{ recipe.id }}/delete" 
+      onsubmit="return confirm('Sei sicuro di voler eliminare questa ricetta?');">
+    <button style="
+        width: 100%;
+        background: #FF3B30;
+        color: white;
+        padding: 14px;
+        border: none;
+        border-radius: 14px;
+        font-size: 18px;
+        margin-top: 20px;
+        font-weight: 700;
+    ">
+        🗑️ Elimina Ricetta
+    </button>
+</form>
+
+
+
+
 </body>
 </html>

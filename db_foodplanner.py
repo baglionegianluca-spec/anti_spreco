@@ -273,3 +273,19 @@ def get_recipe_by_id(recipe_id):
 
 
 
+def delete_recipe(recipe_id):
+    conn = get_db()
+    cur = conn.cursor()
+
+    # Elimina la ricetta
+    cur.execute("DELETE FROM recipes WHERE id = %s", (recipe_id,))
+
+    # Elimina eventuali pianificazioni che usavano quella ricetta
+    cur.execute("DELETE FROM meal_plan_entries WHERE recipe_id = %s", (recipe_id,))
+
+    conn.commit()
+    cur.close()
+
+
+
+

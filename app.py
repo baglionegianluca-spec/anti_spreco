@@ -510,6 +510,13 @@ def recipe_detail(recipe_id):
     return render_template("recipe_detail.html", recipe=recipe, ingredients=ingredients)
 
 
+@app.route("/recipe/<int:recipe_id>/delete", methods=["POST"])
+@login_required
+def delete_recipe_route(recipe_id):
+    delete_recipe(recipe_id)
+    return redirect(url_for("recipes"))
+
+
 
 
 
