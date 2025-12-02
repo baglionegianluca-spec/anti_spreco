@@ -259,3 +259,16 @@ def update_shopping_status(item_id, status):
     """, (status, item_id))
     conn.commit()
     conn.close()
+
+
+def get_recipe_by_id(recipe_id):
+    conn = get_db()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+
+    cur.execute("SELECT * FROM recipes WHERE id = %s", (recipe_id,))
+    row = cur.fetchone()
+
+    cur.close()
+    return row
+
+

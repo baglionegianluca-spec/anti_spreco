@@ -495,6 +495,26 @@ def add_recipe_route():
 
 
 
+
+@app.route("/recipe/<int:recipe_id>")
+@login_required
+def recipe_detail(recipe_id):
+    recipe = get_recipe_by_id(recipe_id)
+
+    # Decodifica JSON degli ingredienti
+    import json
+    ingredients = json.loads(recipe["ingredients"])["text"]
+
+    return render_template("recipe_detail.html", recipe=recipe, ingredients=ingredients)
+
+
+
+
+
+
+
+
+
 # ============================
 #   START APP
 # ============================

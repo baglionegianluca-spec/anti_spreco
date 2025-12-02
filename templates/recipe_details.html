@@ -3,175 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ recipe.name }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
-        /* GLOBAL */
         body {
-            margin: 0;
             padding: 20px;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
-            background-color: #F2F2F7;
+            background: #F2F2F7;
         }
 
-        h1 {
-            font-size: 32px;
-            font-weight: 700;
-            color: #1C1C1E;
-            margin-bottom: 10px;
-        }
-
-        a.back {
-            display: inline-block;
-            margin-bottom: 15px;
-            font-size: 16px;
-            color: #007AFF;
-            text-decoration: none;
-        }
-
-        .container {
-            max-width: 800px;
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 600px;
             margin: auto;
         }
 
-        /* SECTION TITLE */
-        .section-title {
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .ingredients {
             font-size: 20px;
-            font-weight: 600;
-            margin: 18px 0 10px;
-            color: #1C1C1E;
+            white-space: pre-wrap;
         }
 
-        /* INGREDIENT CARD */
-        .ingredient-card {
-            background: white;
-            padding: 15px;
-            border-radius: 14px;
-            margin-bottom: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-            border: 1px solid #E5E5EA;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .ingredient-info {
-            font-size: 17px;
-            color: #1C1C1E;
-        }
-
-        .ingredient-info span {
-            font-weight: 600;
-        }
-
-        .delete-btn {
-            background: none;
-            border: none;
-            color: #FF3B30;
-            font-size: 20px;
-            cursor: pointer;
-        }
-
-        /* INSTRUCTIONS BOX */
-        .instructions-box {
-            background: white;
-            padding: 20px;
-            border-radius: 14px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-            border: 1px solid #E5E5EA;
-            white-space: pre-line;
-            line-height: 1.5;
-            font-size: 17px;
-            color: #1C1C1E;
-        }
-
-        /* ADD INGREDIENT FORM */
-        .add-card {
-            background: white;
-            padding: 20px;
-            border-radius: 16px;
+        a.back {
+            display: block;
             margin-top: 25px;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.06);
-            border: 1px solid #E5E5EA;
-        }
-
-        input[type="text"], input[type="number"] {
-            width: 100%;
-            padding: 12px;
-            border-radius: 12px;
-            border: 1px solid #C7C7CC;
-            background: #FAFAFA;
-            margin-bottom: 12px;
-            font-size: 16px;
-        }
-
-        .btn {
-            background: #007AFF;
-            padding: 12px 18px;
-            border-radius: 12px;
-            color: white;
-            font-size: 17px;
-            border: none;
-            cursor: pointer;
-            width: 100%;
+            text-align: center;
+            font-size: 18px;
+            color: #007AFF;
+            text-decoration: none;
         }
     </style>
 </head>
 
 <body>
-<div class="container">
 
-    <a href="/recipes" class="back">← Torna indietro</a>
-
+<div class="card">
     <h1>{{ recipe.name }}</h1>
 
-    <!-- INGREDIENTI -->
-    <div class="section-title">Ingredienti</div>
+    <h2>Ingredienti:</h2>
+    <div class="ingredients">{{ ingredients }}</div>
 
-    {% if recipe.ingredients_list %}
-        {% for ing in recipe.ingredients_list %}
-        <div class="ingredient-card">
-            <div class="ingredient-info">
-                🥕 <span>{{ ing.ingredient_name }}</span>
-                {% if ing.quantity %}
-                    — {{ ing.quantity }} {{ ing.unit }}
-                {% endif %}
-            </div>
-
-            <form method="POST" action="/delete_ingredient/{{ ing.id }}">
-                <button class="delete-btn">🗑</button>
-            </form>
-        </div>
-        {% endfor %}
-    {% else %}
-        <div style="color:#8E8E93; font-size:16px; margin-bottom:15px;">
-            Nessun ingrediente aggiunto.
-        </div>
-    {% endif %}
-
-
-    <!-- ISTRUZIONI -->
-    <div class="section-title">Istruzioni</div>
-    <div class="instructions-box">
-        {% if recipe.instructions %}
-            {{ recipe.instructions }}
-        {% else %}
-            Nessuna istruzione inserita.
-        {% endif %}
-    </div>
-
-
-    <!-- AGGIUNGI INGREDIENTE -->
-    <div class="add-card">
-        <h2 style="margin-top:0; font-size:22px;">Aggiungi ingrediente</h2>
-
-        <form method="POST" action="/add_ingredient/{{ recipe.id }}">
-            <input type="text" name="ingredient_name" placeholder="Nome ingrediente" required>
-            <input type="number" name="quantity" placeholder="Quantità (es. 100)">
-            <input type="text" name="unit" placeholder="Unità (es. g, ml, pezzi)">
-            <button class="btn" type="submit">Aggiungi</button>
-        </form>
-    </div>
-
+    <a class="back" href="/recipes">← Torna alle ricette</a>
 </div>
+
 </body>
 </html>
