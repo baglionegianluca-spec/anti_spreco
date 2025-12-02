@@ -425,13 +425,13 @@ def food_planner():
     recipes_by_id = {r["id"]: r["name"] for r in recipes}
 
     for i, day in enumerate(days_keys):
-        dp = get_day_plan(day)
+        day_plan = get_day_plan(day)
 
-        week[days_display[i]] = {
-            "lunch_first": recipes_by_id.get(dp.get("lunch_first_recipe_id")),
-            "lunch_second": recipes_by_id.get(dp.get("lunch_second_recipe_id")),
-            "dinner_first": recipes_by_id.get(dp.get("dinner_first_recipe_id")),
-            "dinner_second": recipes_by_id.get(dp.get("dinner_second_recipe_id")),
+        week[day_name] = {
+            "lunch_first": day_plan["lunch_first_name"],
+            "lunch_second": day_plan["lunch_second_name"],
+            "dinner_first": day_plan["dinner_first_name"],
+            "dinner_second": day_plan["dinner_second_name"],
         }
 
     return render_template("food_planner.html", week=week)

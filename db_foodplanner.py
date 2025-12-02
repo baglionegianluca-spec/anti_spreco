@@ -135,18 +135,24 @@ def get_day_plan(day_text):
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT
-            lunch_first_recipe_id,
-            lunch_second_recipe_id,
-            dinner_first_recipe_id,
-            dinner_second_recipe_id
-        FROM meal_plan_entries
-        WHERE day_date = %s;
+        SELECT 
+            mp.*,
+            r1.name AS lunch_first_name,
+            r2.name AS lunch_second_name,
+            r3.name AS dinner_first_name,
+            r4.name AS dinner_second_name
+        FROM meal_plan_entries mp
+        LEFT JOIN recipes r1 ON mp.lunch_first_recipe_id = r1.id
+        LEFT JOIN recipes r2 ON mp.lunch_second_recipe_id = r2.id
+        LEFT JOIN recipes r3 ON mp.dinner_first_recipe_id = r3.id
+        LEFT JOIN recipes r4 ON mp.dinner_second_recipe_id = r4.id
+        WHERE mp.day_date = %s;
     """, (day_text,))
 
-    row = cur.fetchone()
+    result = cur.fetchone()
     conn.close()
-    return row or {}
+    return result
+
 
 
 
