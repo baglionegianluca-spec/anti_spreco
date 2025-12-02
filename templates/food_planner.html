@@ -8,7 +8,7 @@
         body {
             margin: 0;
             padding: 20px;
-            padding-bottom: 110px; /* SAFE AREA per non coprire il contenuto con la navbar */
+            padding-bottom: 120px; /* SAFE AREA per la navbar */
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
             background-color: #F2F2F7;
         }
@@ -74,32 +74,49 @@
             .meal-box { flex-direction: column; gap: 6px; }
         }
 
-        /* NAVBAR IN BASSO STILE iOS */
+        /* NAVBAR STILE iOS */
         .navbar {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
 
+            height: 85px;
+            background: #FFFFFF;
+
+            border-radius: 20px 20px 0 0;
+            border-top: 1px solid #E5E5EA;
+            box-shadow: 0 -4px 14px rgba(0,0,0,0.15);
+
             display: flex;
             justify-content: space-around;
             align-items: center;
-
-            background: #FFFFFF;
-            padding: 12px 0;
-            border-radius: 20px 20px 0 0;
-
-            box-shadow: 0 -4px 14px rgba(0,0,0,0.18);
-            border-top: 1px solid #E5E5EA;
-
             z-index: 999;
         }
 
-        .navbar a {
+        .nav-item {
+            width: 25%;
+            height: 100%;
+            padding-top: 10px;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
             text-decoration: none;
             color: #007AFF;
-            font-size: 17px;
+
             font-weight: 600;
+        }
+
+        .nav-item .icon {
+            font-size: 26px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item .label {
+            font-size: 12px;
         }
     </style>
 </head>
@@ -154,15 +171,29 @@
 
     </div>
     {% endfor %}
-
 </div>
 
-<!-- NAVBAR FISSA IN BASSO -->
+<!-- NAVBAR IN BASSO -->
 <div class="navbar">
-    <a href="/dashboard">🏠 Home</a>
-    <a href="/recipes">📚 Ricette</a>
-    <a href="/add_recipe">➕ Nuova Ricetta</a>
-    <a href="/shopping_list">🛒 Lista Spesa</a>
+    <a href="/food-planner" class="nav-item">
+        <div class="icon">🏠</div>
+        <div class="label">Home</div>
+    </a>
+    
+    <a href="/recipes" class="nav-item">
+        <div class="icon">📚</div>
+        <div class="label">Ricette</div>
+    </a>
+
+    <a href="/food-planner/add" class="nav-item">
+        <div class="icon">➕</div>
+        <div class="label">Aggiungi</div>
+    </a>
+
+    <a href="/shopping_list" class="nav-item">
+        <div class="icon">🛒</div>
+        <div class="label">Spesa</div>
+    </a>
 </div>
 
 </body>
