@@ -416,23 +416,30 @@ def delete_product(product_id):
 @app.route("/food-planner")
 @login_required
 def food_planner():
-    days_display = ["Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato","Domenica"]
-    days_keys = ["lunedì","martedì","mercoledì","giovedì","venerdì","sabato","domenica"]
+    # Nomi dei giorni in italiano
+    days_names = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"]
 
     week = {}
-    
-    recipes = get_all_recipes()
-    recipes_by_id = {r["id"]: r["name"] for r in recipes}
 
-    for i, day in enumerate(days_keys):
-        day_plan = get_day_plan(day)
+    # Per ogni giorno (lunedì→domenica) prendiamo ciò che è salvato
+    for day_name in days_names:
 
-        week[day_name] = {
-            "lunch_first": day_plan["lunch_first_name"],
-            "lunch_second": day_plan["lunch_second_name"],
-            "dinner_first": day_plan["dinner_first_name"],
-            "dinner_second": day_plan["dinner_second_name"],
-        }
+        day_plan = get_day_plan(day_name)
+
+        if day_plan:
+            week[day_name] = {
+                "lunch_first": day_plan.get("lunch_first_name"),
+                "lunch_second": day_plan.get("lunch_second_name"),
+                "dinner_first": day_plan.get("dinner_first_name"),
+                "dinner_second": day_plan.get("dinner_second_name"),
+            }
+        else:
+            week[day_name] = {
+                "lunch_first": None,
+                "lunch_second": None,
+                "dinner_first": None,
+                "dinner_second": None,
+            }
 
     return render_template("food_planner.html", week=week)
 
