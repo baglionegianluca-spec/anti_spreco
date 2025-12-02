@@ -78,7 +78,6 @@ def dashboard():
 @app.route("/anti-spreco")
 @login_required
 def anti_spreco_dashboard():
-    conn = get_db()
     products = get_all_products()
 
     today = date.today()
@@ -140,8 +139,7 @@ from datetime import datetime, date
 @app.route("/products")
 @login_required
 def products():
-    conn = get_db()
-    rows = get_all_products(conn)
+    rows = get_all_products()
 
     today = date.today()
     filter_type = request.args.get("filter")
@@ -274,7 +272,7 @@ def add():
             cur.execute("""
                 UPDATE products SET
                     name=%s, barcode=%s, brand=%s, category=%s, image_url=%s,
-                    quantity=%S, expiry_date=%s
+                    quantity=%s, expiry_date=%s
                 WHERE id=%s
             """, (name, barcode, brand, category, image_url, quantity, expiry_date, product_id))
         else:
