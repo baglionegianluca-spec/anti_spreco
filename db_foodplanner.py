@@ -144,17 +144,24 @@ def get_ingredients(recipe_id):
 def get_day_plan(day_date):
     conn = get_db()
     cur = conn.cursor()
+
     cur.execute("""
-        SELECT mp.id, mp.day_date, mp.meal_type, mp.custom_note, mp.is_done,
-               r.id AS recipe_id, r.name AS recipe_name
+        SELECT 
+            mp.id,
+            mp.meal_type,
+            mp.recipe_id,
+            mp.custom_note,
+            r.name AS recipe_name
         FROM meal_plan_entries mp
         LEFT JOIN recipes r ON mp.recipe_id = r.id
         WHERE mp.day_date = %s
-        ORDER BY mp.meal_type;
+        ORDER BY mp.meal_type
     """, (day_date,))
+
     rows = cur.fetchall()
     conn.close()
     return rows
+
 
 
 def assign_recipe(day_date, meal_type, recipe_id):
