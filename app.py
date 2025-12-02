@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 # --- FOOD PLANNER IMPORT ---
 from db_foodplanner import (
+    init_foodplanner_tables,
     get_all_recipes,
     add_recipe,
     assign_recipe,
