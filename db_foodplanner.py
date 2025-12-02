@@ -12,7 +12,6 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 # ============================
 
 def get_db():
-    """Restituisce una connessione PostgreSQL usando RealDictCursor."""
     return psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
 
 
@@ -34,7 +33,7 @@ def init_foodplanner_tables():
         );
     """)
 
-    # 2) Ingredienti delle ricette
+    # 2) Ingredienti
     cur.execute("""
         CREATE TABLE IF NOT EXISTS recipe_ingredients (
             id SERIAL PRIMARY KEY,
@@ -45,11 +44,11 @@ def init_foodplanner_tables():
         );
     """)
 
-    # 3) Planner giornaliero
+    # 3) Planner giornaliero — 🔥 day_date ora è TEXT
     cur.execute("""
         CREATE TABLE IF NOT EXISTS meal_plan_entries (
             id SERIAL PRIMARY KEY,
-            day_date DATE NOT NULL,
+            day_date TEXT NOT NULL,
             meal_type TEXT NOT NULL,
             recipe_id INTEGER REFERENCES recipes(id) ON DELETE SET NULL,
             custom_note TEXT,
@@ -58,7 +57,7 @@ def init_foodplanner_tables():
         );
     """)
 
-    # 4) Lista della spesa
+    # 4) Lista della spesa (lasciamo DATE per week_start)
     cur.execute("""
         CREATE TABLE IF NOT EXISTS shopping_items (
             id SERIAL PRIMARY KEY,
@@ -88,26 +87,16 @@ def get_all_recipes():
     return rows
 
 
-
-
-
-
 def add_recipe(name, ingredients):
     conn = get_db()
     cur = conn.cursor()
-
-    # 🔥 Converti la STRINGA in JSON valido
     json_ingredients = json.dumps({"text": ingredients})
-
     cur.execute("""
-        INSERT INTO recipes (name, ingredients)
+        INSERT INTO recipes (name, notes)
         VALUES (%s, %s)
     """, (name, json_ingredients))
-
     conn.commit()
     cur.close()
-
-
 
 
 # ============================
@@ -138,10 +127,11 @@ def get_ingredients(recipe_id):
 
 
 # ============================
-#   PLANNER GIORNALIERO
+#   PLANNER GIORNALIERO (TEXT)
 # ============================
 
-def get_day_plan(day_date):
+def get_day_plan(day_text):
+    """Ritorna il piano per un giorno (es: 'lunedì')."""
     conn = get_db()
     cur = conn.cursor()
 
@@ -151,22 +141,24 @@ def get_day_plan(day_date):
             mp.meal_type,
             mp.recipe_id,
             mp.custom_note,
+            mp.is_done,
             r.name AS recipe_name
         FROM meal_plan_entries mp
         LEFT JOIN recipes r ON mp.recipe_id = r.id
         WHERE mp.day_date = %s
-        ORDER BY mp.meal_type
-    """, (day_date,))
+        ORDER BY mp.meal_type;
+    """, (day_text,))
 
     rows = cur.fetchall()
     conn.close()
     return rows
 
 
-
-def assign_recipe(day_date, meal_type, recipe_id):
+def assign_recipe(day_text, meal_type, recipe_id):
+    """Inserisce o aggiorna il pasto del giorno dato (giorno TEXT)."""
     conn = get_db()
     cur = conn.cursor()
+
     cur.execute("""
         INSERT INTO meal_plan_entries (day_date, meal_type, recipe_id)
         VALUES (%s, %s, %s)
@@ -174,7 +166,8 @@ def assign_recipe(day_date, meal_type, recipe_id):
         SET recipe_id = EXCLUDED.recipe_id,
             is_done = FALSE,
             custom_note = NULL;
-    """, (day_date, meal_type, recipe_id))
+    """, (day_text, meal_type, recipe_id))
+
     conn.commit()
     conn.close()
 
@@ -208,28 +201,31 @@ def mark_meal_done(entry_id):
 # ============================
 
 def get_week_plan():
-    """Ritorna tutte le entries del planner ordinate per giorno e pasto."""
+    """Ritorna la settimana intera (ordinata per giorno come TESTO)."""
     conn = get_db()
     cur = conn.cursor()
+
     cur.execute("""
-        SELECT mp.id,
-               mp.day_date,
-               mp.meal_type,
-               mp.custom_note,
-               mp.is_done,
-               r.id AS recipe_id,
-               r.name AS recipe_name
+        SELECT 
+            mp.id,
+            mp.day_date,
+            mp.meal_type,
+            mp.recipe_id,
+            mp.custom_note,
+            mp.is_done,
+            r.name AS recipe_name
         FROM meal_plan_entries mp
         LEFT JOIN recipes r ON mp.recipe_id = r.id
         ORDER BY mp.day_date, mp.meal_type;
     """)
+
     rows = cur.fetchall()
     conn.close()
     return rows
 
 
 # ============================
-#   LISTA DELLA SPESA
+#   LISTA SPESA
 # ============================
 
 def add_shopping_item(week_start, name, quantity, unit):
@@ -271,28 +267,16 @@ def update_shopping_status(item_id, status):
 def get_recipe_by_id(recipe_id):
     conn = get_db()
     cur = conn.cursor(cursor_factory=RealDictCursor)
-
     cur.execute("SELECT * FROM recipes WHERE id = %s", (recipe_id,))
     row = cur.fetchone()
-
     cur.close()
     return row
-
 
 
 def delete_recipe(recipe_id):
     conn = get_db()
     cur = conn.cursor()
-
-    # Elimina la ricetta
     cur.execute("DELETE FROM recipes WHERE id = %s", (recipe_id,))
-
-    # Elimina eventuali pianificazioni che usavano quella ricetta
     cur.execute("DELETE FROM meal_plan_entries WHERE recipe_id = %s", (recipe_id,))
-
     conn.commit()
     cur.close()
-
-
-
-
