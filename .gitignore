@@ -1,0 +1,10 @@
+# File da ignorare
+.DS_Store
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+venv/
+.venv/
+

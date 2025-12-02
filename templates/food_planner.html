@@ -1,38 +1,113 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
 <head>
-    <title>Food Planner</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <meta charset="UTF-8">
+    <title>Food Planner Settimanale</title>
+
+    <style>
+        /* ------------------------------
+            GLOBAL STYLE - iOS 17 LOOK
+        ------------------------------ */
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+            background-color: #F2F2F7;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 32px;
+            color: #1C1C1E;
+            font-weight: 700;
+        }
+
+        .week-container {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        /* ------------------------------
+            DAY CARD STYLE
+        ------------------------------ */
+        .day-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 18px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            border: 1px solid #E5E5EA;
+        }
+
+        .day-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1C1C1E;
+            margin-bottom: 12px;
+        }
+
+        .meal-box {
+            display: flex;
+            justify-content: space-between;
+            padding: 14px 16px;
+            border-radius: 14px;
+            background: #F8F8F8;
+            border: 1px solid #E0E0E0;
+            margin-bottom: 10px;
+        }
+
+        .meal-label {
+            font-weight: 600;
+            color: #3A3A3C;
+            font-size: 16px;
+        }
+
+        .meal-value {
+            font-size: 16px;
+            color: #007AFF;
+            font-weight: 500;
+        }
+
+        .meal-empty {
+            color: #A1A1A1;
+            font-style: italic;
+        }
+
+        /* ------------------------------
+            RESPONSIVE
+        ------------------------------ */
+        @media (max-width: 600px) {
+            .day-card {
+                padding: 16px;
+            }
+            .meal-box {
+                flex-direction: column;
+                gap: 6px;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-<h1 style="text-align:center;">Food Planner Settimanale</h1>
+<h1>Food Planner Settimanale</h1>
 
 <div class="week-container">
 
-    {% for key, label in days %}
-    <div class="day-box">
-        <h2>{{ label }}</h2>
+    {% for day, meals in week.items() %}
+    <div class="day-card">
+        <div class="day-title">{{ day }}</div>
 
-        <p><strong>Pranzo:</strong> {{ plan[key][2] if key in plan else "—" }}</p>
-        <a href="/edit-meal?day={{ key }}&meal=lunch" class="btn">Aggiungi/Modifica</a>
+        <div class="meal-box">
+            <div class="meal-label">Pranzo</div>
+            <div class="meal-value">
+                {% if meals.lunch %}
+                    {{ meals.lunch }}
+                {% else %}
+                    <span class="meal-empty">Nessuna ricetta</span>
+                {% endif %}
+            </div>
+        </div>
 
-        <br><br>
-
-        <p><strong>Cena:</strong> {{ plan[key][3] if key in plan else "—" }}</p>
-        <a href="/edit-meal?day={{ key }}&meal=dinner" class="btn">Aggiungi/Modifica</a>
-
-        <br><br>
-
-        {% if key in plan %}
-            <a href="/mark-done?day={{ key }}" class="btn-small">
-                Segna come FATTO
-            </a>
-        {% endif %}
-    </div>
-    {% endfor %}
-
-</div>
-
-</body>
-</html>
+        <div class="meal-box"
