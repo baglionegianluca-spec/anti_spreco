@@ -5,12 +5,24 @@ from scheduler import setup_scheduler
 from db import get_db, add_product, get_all_products
 from dotenv import load_dotenv
 
+# --- FOOD PLANNER IMPORT ---
+from db_foodplanner import (
+    get_all_recipes, add_recipe,
+    assign_recipe_to_day, get_week_plan,
+    remove_planned_recipe, mark_meal_done,
+    init_foodplanner_tables
+)
+
+# Carico variabili ambiente
 load_dotenv()
+
+# ✅ Inizializzo le tabelle del food planner PRIMA di creare l'app
+init_foodplanner_tables()
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "chiave-segreta-cambia-questa")
 
-APP_PASSWORD = os.getenv("APP_PASSWORD", "1234")  # metti la tua password nel file .env
+APP_PASSWORD = os.getenv("APP_PASSWORD", "1234")
 
 
 # ============================
@@ -117,14 +129,6 @@ def anti_spreco_dashboard():
 
 
 
-
-# ============================
-#   FOOD PLANNER
-# ============================
-@app.route("/food-planner")
-@login_required
-def food_planner():
-    return "<h1 style='text-align:center;margin-top:40px;'>FOOD PLANNER (in arrivo)</h1>"
 
 
 
@@ -394,6 +398,93 @@ def delete_product(product_id):
     cur.execute("DELETE FROM products WHERE id = %s", (product_id,))
     conn.commit()
     return redirect(url_for("products"))
+
+
+
+
+@app.route("/food-planner")
+@login_required
+def food_planner():
+    """
+    Mostra la pagina principale del planner settimanale.
+    """
+    week = get_week_plan()
+    # week ritorna qualcosa tipo:
+    # [
+    #   {"plan_id": 1, "day": "lunedì", "meal": "pranzo", "recipe_name": "Pollo"},
+    #   {"plan_id": 2, "day": "lunedì", "meal": "cena", "recipe_name": "Pasta"},
+    # ]
+    days_order = ["lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"]
+
+    # Riorganizzo in formato leggibile per il template
+    week_struct = {d: {"pranzo": None, "cena": None} for d in days_order}
+
+    for row in week:
+        week_struct[row["day"]][row["meal"]] = {
+            "plan_id": row["plan_id"],
+            "recipe_name": row["recipe_name"]
+        }
+
+    return render_template("food_planner.html", week=week_struct)
+
+
+# ============================
+#   AGGIUNGI RICETTA A UN GIORNO
+# ============================
+
+@app.route("/food-planner/add", methods=["GET", "POST"])
+@login_required
+def food_planner_add():
+    if request.method == "POST":
+        day = request.form["day"]
+        meal = request.form["meal"]       # pranzo / cena
+        recipe_id = request.form["recipe_id"]
+
+        assign_recipe_to_day(day, meal, recipe_id)
+        return redirect(url_for("food_planner"))
+
+    recipes = get_all_recipes()
+    days = ["lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"]
+    return render_template("planner_add.html", recipes=recipes, days=days)
+
+
+
+# ============================
+#   RIMUOVI UNA RICETTA DAL GIORNO
+# ============================
+
+@app.route("/food-planner/delete/<int:plan_id>")
+@login_required
+def food_planner_delete(plan_id):
+    remove_planned_recipe(plan_id)
+    return redirect(url_for("food_planner"))
+
+
+# ============================
+#   RICETTE SALVATE
+# ============================
+
+@app.route("/recipes")
+@login_required
+def recipes():
+    rows = get_all_recipes()
+    return render_template("recipes.html", recipes=rows)
+
+# ============================
+#   AGGIUNGI RICETTA
+# ============================
+@app.route("/recipes/add", methods=["GET", "POST"])
+@login_required
+def recipes_add():
+    if request.method == "POST":
+        name = request.form["name"]
+        ingredients = request.form["ingredients"]
+        add_recipe(name, ingredients)
+        return redirect(url_for("recipes"))
+
+    return render_template("recipes_add.html")
+
+
 
 
 
