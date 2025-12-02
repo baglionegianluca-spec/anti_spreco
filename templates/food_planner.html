@@ -2,23 +2,24 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Food Planner Settimanale</title>
 
     <style>
         body {
             margin: 0;
             padding: 20px;
-            padding-bottom: 120px; /* SAFE AREA per la navbar */
+            padding-bottom: 140px; /* spazio per la navbar */
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
             background-color: #F2F2F7;
         }
 
         h1 {
             text-align: center;
-            margin-bottom: 25px;
-            font-size: 32px;
+            margin-bottom: 30px;
+            font-size: 34px;
             color: #1C1C1E;
-            font-weight: 700;
+            font-weight: 800;
         }
 
         .week-container {
@@ -28,95 +29,85 @@
 
         .day-card {
             background: white;
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 18px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            border-radius: 22px;
+            padding: 22px;
+            margin-bottom: 22px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
             border: 1px solid #E5E5EA;
         }
 
         .day-title {
-            font-size: 22px;
-            font-weight: 600;
+            font-size: 26px;
+            font-weight: 700;
             color: #1C1C1E;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
 
         .meal-box {
             display: flex;
             justify-content: space-between;
-            padding: 14px 16px;
-            border-radius: 14px;
+            padding: 18px 20px;
+            border-radius: 16px;
             background: #F8F8F8;
-            border: 1px solid #E0E0E0;
-            margin-bottom: 10px;
+            border: 1px solid #DDDDDD;
+            margin-bottom: 14px;
         }
 
         .meal-label {
-            font-weight: 600;
+            font-weight: 700;
             color: #3A3A3C;
-            font-size: 16px;
+            font-size: 20px;
         }
 
         .meal-value {
-            font-size: 16px;
+            font-size: 20px;
             color: #007AFF;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .meal-empty {
             color: #A1A1A1;
             font-style: italic;
+            font-size: 18px;
         }
 
-        @media (max-width: 600px) {
-            .day-card { padding: 16px; }
-            .meal-box { flex-direction: column; gap: 6px; }
-        }
-
-        /* NAVBAR STILE iOS */
+        /* NAVBAR STILE IPHONE */
         .navbar {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
 
-            height: 85px;
+            height: 95px;
             background: #FFFFFF;
 
             border-radius: 20px 20px 0 0;
             border-top: 1px solid #E5E5EA;
-            box-shadow: 0 -4px 14px rgba(0,0,0,0.15);
+            box-shadow: 0 -4px 14px rgba(0,0,0,0.20);
 
             display: flex;
             justify-content: space-around;
             align-items: center;
+
             z-index: 999;
         }
 
         .nav-item {
             width: 25%;
-            height: 100%;
-            padding-top: 10px;
-
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-
+            text-align: center;
             text-decoration: none;
             color: #007AFF;
-
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .nav-item .icon {
-            font-size: 26px;
-            margin-bottom: 4px;
+            font-size: 28px;
+            display: block;
         }
 
         .nav-item .label {
-            font-size: 12px;
+            font-size: 14px;
+            margin-top: 3px;
         }
     </style>
 </head>
@@ -127,30 +118,17 @@
 
 <div class="week-container">
 
-    {% set grouped = {} %}
-    {% for entry in week %}
-        {% set day = entry.day_date|string %}
-        {% if day not in grouped %}
-            {% set _ = grouped.update({
-                day: {"lunch": None, "dinner": None}
-            }) %}
-        {% endif %}
-
-        {% if entry.meal_type == "pranzo" %}
-            {% set _ = grouped[day].update({"lunch": entry.recipe_name}) %}
-        {% elif entry.meal_type == "cena" %}
-            {% set _ = grouped[day].update({"dinner": entry.recipe_name}) %}
-        {% endif %}
-    {% endfor %}
-
-    {% for day, meals in grouped.items() %}
+    {% for day, meals in week.items() %}
     <div class="day-card">
+
+        <!-- NOME GIORNO -->
         <div class="day-title">{{ day }}</div>
 
+        <!-- PRANZO -->
         <div class="meal-box">
             <div class="meal-label">Pranzo</div>
             <div class="meal-value">
-                {% if meals.lunch %}
+                {% if meals.lunch != "—" %}
                     {{ meals.lunch }}
                 {% else %}
                     <span class="meal-empty">Nessuna ricetta</span>
@@ -158,10 +136,11 @@
             </div>
         </div>
 
+        <!-- CENA -->
         <div class="meal-box">
             <div class="meal-label">Cena</div>
             <div class="meal-value">
-                {% if meals.dinner %}
+                {% if meals.dinner != "—" %}
                     {{ meals.dinner }}
                 {% else %}
                     <span class="meal-empty">Nessuna ricetta</span>
@@ -171,28 +150,29 @@
 
     </div>
     {% endfor %}
+
 </div>
 
-<!-- NAVBAR IN BASSO -->
+<!-- NAVBAR -->
 <div class="navbar">
-    <a href="/food-planner" class="nav-item">
-        <div class="icon">🏠</div>
-        <div class="label">Home</div>
+    <a href="/dashboard" class="nav-item">
+        <span class="icon">🏠</span>
+        <span class="label">Home</span>
     </a>
-    
+
     <a href="/recipes" class="nav-item">
-        <div class="icon">📚</div>
-        <div class="label">Ricette</div>
+        <span class="icon">📚</span>
+        <span class="label">Ricette</span>
     </a>
 
     <a href="/food-planner/add" class="nav-item">
-        <div class="icon">➕</div>
-        <div class="label">Aggiungi</div>
+        <span class="icon">➕</span>
+        <span class="label">Aggiungi</span>
     </a>
 
     <a href="/shopping_list" class="nav-item">
-        <div class="icon">🛒</div>
-        <div class="label">Spesa</div>
+        <span class="icon">🛒</span>
+        <span class="label">Spesa</span>
     </a>
 </div>
 

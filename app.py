@@ -404,41 +404,46 @@ def delete_product(product_id):
     return redirect(url_for("products"))
 
 
+# ============================
+#   FOOD PLANNER (visualizzazione settimana)
+# ============================
 
 @app.route("/food-planner")
 @login_required
 def food_planner():
     import datetime
     
-    # Trova il lunedì della settimana corrente
     today = datetime.date.today()
     monday = today - datetime.timedelta(days=today.weekday())
-    
-    days = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"]
+
+    days_names = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"]
     week = {}
 
     for i in range(7):
         d = monday + datetime.timedelta(days=i)
         day_plan = get_day_plan(d)
 
-        # Estraggo pranzo/cena se ci sono
-        lunch = next((x["recipe_name"] for x in day_plan if x["meal_type"] == "pranzo"), "—")
-        dinner = next((x["recipe_name"] for x in day_plan if x["meal_type"] == "cena"), "—")
+        lunch = next((x["recipe_name"] for x in day_plan if x["meal_type"] == "pranzo"), None)
+        dinner = next((x["recipe_name"] for x in day_plan if x["meal_type"] == "cena"), None)
 
-        week[days[i]] = {
-            "lunch": lunch,
-            "dinner": dinner
+        week[days_names[i]] = {
+            "lunch": lunch or "—",
+            "dinner": dinner or "—"
         }
 
     return render_template("food_planner.html", week=week)
 
+
 # ============================
-#   AGGIUNGI RICETTA A UN GIORNO
+#   AGGIUNGI / MODIFICA PASTO
 # ============================
 
 @app.route("/food-planner/add", methods=["GET", "POST"])
 @login_required
 def food_planner_add():
+    days = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"]
+    recipes = get_all_recipes()
+
     if request.method == "POST":
         day = request.form["day"]
         meal = request.form["meal"]       # pranzo / cena
@@ -447,14 +452,11 @@ def food_planner_add():
         assign_recipe_to_day(day, meal, recipe_id)
         return redirect(url_for("food_planner"))
 
-    recipes = get_all_recipes()
-    days = ["lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"]
-    return render_template("planner_add.html", recipes=recipes, days=days)
-
+    return render_template("planner.html", days=days, recipes=recipes)
 
 
 # ============================
-#   RIMUOVI UNA RICETTA DAL GIORNO
+#   RIMUOVI PASTO
 # ============================
 
 @app.route("/food-planner/delete/<int:plan_id>")
@@ -465,7 +467,7 @@ def food_planner_delete(plan_id):
 
 
 # ============================
-#   RICETTE SALVATE
+#   RICETTE
 # ============================
 
 @app.route("/recipes")
@@ -474,20 +476,21 @@ def recipes():
     rows = get_all_recipes()
     return render_template("recipes.html", recipes=rows)
 
+
 # ============================
 #   AGGIUNGI RICETTA
 # ============================
-@app.route("/recipes/add", methods=["GET", "POST"])
+
+@app.route("/add_recipe", methods=["GET", "POST"])
 @login_required
-def recipes_add():
+def add_recipe_route():
     if request.method == "POST":
         name = request.form["name"]
         ingredients = request.form["ingredients"]
         add_recipe(name, ingredients)
         return redirect(url_for("recipes"))
 
-    return render_template("recipes_add.html")
-
+    return render_template("add_recipe.html")
 
 
 

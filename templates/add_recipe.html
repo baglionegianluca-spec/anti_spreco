@@ -2,93 +2,68 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aggiungi Ricetta</title>
 
     <style>
         body {
             margin: 0;
             padding: 20px;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
-            background-color: #F2F2F7;
+            padding-bottom: 120px;
+            font-family: -apple-system;
+            background: #F2F2F7;
         }
 
         h1 {
-            font-size: 30px;
-            font-weight: 700;
             text-align: center;
-            margin-bottom: 25px;
-            color: #1C1C1E;
+            font-size: 30px;
+            font-weight: 800;
+            margin-bottom: 20px;
         }
 
-        .form-container {
+        .card {
             background: white;
-            max-width: 650px;
-            margin: auto;
-            padding: 20px 25px;
+            padding: 22px;
             border-radius: 16px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-            border: 1px solid #E5E5EA;
+            max-width: 900px;
+            margin: auto;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.10);
         }
 
         label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 17px;
-            font-weight: 500;
-            color: #1C1C1E;
-        }
-
-        input[type="text"],
-        textarea {
-            width: 100%;
-            padding: 12px 14px;
-            margin-bottom: 20px;
-            border: 1px solid #D1D1D6;
-            border-radius: 12px;
-            font-size: 16px;
-            background: #FAFAFA;
-            outline: none;
-            transition: all 0.2s;
-        }
-
-        input[type="text"]:focus,
-        textarea:focus {
-            border-color: #007AFF;
-            background: white;
-        }
-
-        textarea {
-            min-height: 160px;
-            resize: vertical;
-            line-height: 1.4em;
-        }
-
-        .btn-submit {
-            width: 100%;
-            background: #007AFF;
-            color: white;
-            padding: 14px;
-            border-radius: 14px;
-            border: none;
             font-size: 18px;
             font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-            margin-top: 10px;
         }
 
-        .btn-submit:active {
-            background: #005FCC;
-        }
-
-        .back-link {
-            display: block;
-            margin-top: 18px;
-            text-align: center;
+        input, textarea {
+            width: 100%;
+            padding: 12px;
             font-size: 16px;
-            color: #007AFF;
-            text-decoration: none;
+            border-radius: 10px;
+            border: 1px solid #CCC;
+            margin-top: 6px;
+            margin-bottom: 16px;
         }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #007AFF;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+        }
+
+        /* NAVBAR */
+        .navbar { position: fixed; bottom: 0; left: 0; right: 0; height: 95px;
+            background: #FFF; border-radius: 20px 20px 0 0;
+            border-top: 1px solid #E5E5EA; box-shadow: 0 -4px 14px rgba(0,0,0,0.20);
+            display: flex; justify-content: space-around; align-items: center; }
+        .nav-item { width: 25%; text-align: center; text-decoration: none; color: #007AFF; font-weight: 700; }
+        .nav-item .icon { font-size: 28px; display: block; }
+        .nav-item .label { font-size: 14px; margin-top: 3px; }
     </style>
 </head>
 
@@ -96,29 +71,24 @@
 
 <h1>Nuova Ricetta</h1>
 
-<div class="form-container">
+<div class="card">
+    <form method="POST">
+        <label>Nome Ricetta</label>
+        <input type="text" name="name" required>
 
-    <form method="POST" action="/add_recipe">
-        
-        <!-- Nome ricetta -->
-        <label>Nome della ricetta</label>
-        <input type="text" name="name" placeholder="Es: Pollo al limone" required>
+        <label>Ingredienti</label>
+        <textarea name="ingredients" rows="6" required></textarea>
 
-        <!-- Ingredienti -->
-        <label>Ingredienti (uno per riga)</label>
-        <textarea name="ingredients" placeholder="Es:
-- 300g petto di pollo
-- 1 limone
-- Olio d'oliva
-- Sale
-- Pepe nero" required></textarea>
-
-        <!-- Pulsante -->
-        <button class="btn-submit" type="submit">Salva Ricetta</button>
+        <button type="submit">Salva</button>
     </form>
+</div>
 
-    <a href="/recipes" class="back-link">← Torna alle ricette</a>
-
+<!-- NAVBAR -->
+<div class="navbar">
+    <a href="/dashboard" class="nav-item"><span class="icon">🏠</span><span class="label">Home</span></a>
+    <a href="/recipes" class="nav-item"><span class="icon">📚</span><span class="label">Ricette</span></a>
+    <a href="/food-planner/add" class="nav-item"><span class="icon">➕</span><span class="label">Aggiungi</span></a>
+    <a href="/shopping_list" class="nav-item"><span class="icon">🛒</span><span class="label">Spesa</span></a>
 </div>
 
 </body>

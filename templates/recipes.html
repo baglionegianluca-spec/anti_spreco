@@ -2,22 +2,23 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ricette</title>
 
     <style>
         body {
             margin: 0;
             padding: 20px;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
-            background-color: #F2F2F7;
+            padding-bottom: 120px;
+            font-family: -apple-system;
+            background: #F2F2F7;
         }
 
         h1 {
-            font-size: 32px;
-            font-weight: 700;
             text-align: center;
-            margin-bottom: 25px;
-            color: #1C1C1E;
+            font-size: 34px;
+            margin-bottom: 20px;
+            font-weight: 800;
         }
 
         .container {
@@ -27,100 +28,109 @@
 
         .recipe-card {
             background: white;
-            padding: 18px 20px;
+            padding: 18px;
             border-radius: 16px;
-            margin-bottom: 18px;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             border: 1px solid #E5E5EA;
         }
 
-        .recipe-title {
-            font-size: 22px;
-            font-weight: 600;
+        .recipe-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0;
             color: #1C1C1E;
-            margin-bottom: 8px;
         }
 
-        .ingredients {
-            font-size: 16px;
-            color: #3A3A3C;
-            margin-bottom: 15px;
-            white-space: pre-line;
-        }
-
-        .btn {
-            background: #007AFF;
-            padding: 9px 14px;
-            border: none;
-            color: white;
-            border-radius: 12px;
-            font-size: 15px;
-            cursor: pointer;
-            margin-right: 8px;
-            margin-bottom: 6px;
-        }
-
-        .btn-danger {
-            background: #FF3B30;
-        }
-
-        /* Bottone + stile iOS */
-        .floating-add {
+        .add-button {
             position: fixed;
-            bottom: 25px;
-            right: 25px;
+            top: 16px;
+            right: 16px;
             background: #007AFF;
-            width: 60px;
-            height: 60px;
             color: white;
-            font-size: 36px;
-            text-align: center;
+            width: 55px;
+            height: 55px;
             border-radius: 50%;
-            line-height: 60px;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.25);
-            cursor: pointer;
+            font-size: 32px;
+            line-height: 55px;
+            text-align: center;
             text-decoration: none;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+        }
+
+        /* NAVBAR */
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 95px;
+            background: #FFFFFF;
+            border-radius: 20px 20px 0 0;
+            border-top: 1px solid #E5E5EA;
+            box-shadow: 0 -4px 14px rgba(0,0,0,0.20);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .nav-item {
+            width: 25%;
+            text-align: center;
+            text-decoration: none;
+            color: #007AFF;
+            font-weight: 700;
+        }
+
+        .nav-item .icon {
+            font-size: 28px;
+            display: block;
+        }
+
+        .nav-item .label {
+            font-size: 14px;
+            margin-top: 3px;
         }
     </style>
 </head>
 
 <body>
 
-<h1>Le tue ricette</h1>
+<a href="/add_recipe" class="add-button">+</a>
+
+<h1>Ricette</h1>
 
 <div class="container">
     {% for recipe in recipes %}
         <div class="recipe-card">
-
-            <div class="recipe-title">{{ recipe.name }}</div>
-
-            <div class="ingredients">
-                <strong>Ingredienti:</strong><br>
-                {{ recipe.ingredients }}
-            </div>
-
-            <!-- Pulsanti azione -->
-            <form method="POST" action="/delete_recipe" style="display:inline;">
-                <input type="hidden" name="recipe_id" value="{{ recipe.id }}">
-                <button class="btn btn-danger">Elimina</button>
-            </form>
-
-            {% if assign_mode %}
-                <!-- Se siamo arrivati qui da "assegna ricetta" -->
-                <form method="POST" action="/assign_recipe" style="display:inline;">
-                    <input type="hidden" name="recipe_id" value="{{ recipe.id }}">
-                    <input type="hidden" name="day" value="{{ assign_day }}">
-                    <input type="hidden" name="meal" value="{{ assign_meal }}">
-                    <button class="btn">Usa questa</button>
-                </form>
-            {% endif %}
+            <p class="recipe-name">{{ recipe.name }}</p>
         </div>
     {% endfor %}
-
 </div>
 
-<!-- Bottone + flottante -->
-<a href="/add-recipe" class="floating-add">+</a>
+<!-- NAVBAR -->
+<div class="navbar">
+    <a href="/dashboard" class="nav-item">
+        <span class="icon">🏠</span>
+        <span class="label">Home</span>
+    </a>
+
+    <a href="/recipes" class="nav-item">
+        <span class="icon">📚</span>
+        <span class="label">Ricette</span>
+    </a>
+
+    <a href="/food-planner/add" class="nav-item">
+        <span class="icon">➕</span>
+        <span class="label">Aggiungi</span>
+    </a>
+
+    <a href="/shopping_list" class="nav-item">
+        <span class="icon">🛒</span>
+        <span class="label">Spesa</span>
+    </a>
+</div>
 
 </body>
 </html>

@@ -2,195 +2,98 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Planner Settimanale</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aggiungi al Planner</title>
 
     <style>
         body {
             margin: 0;
             padding: 20px;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
-            background-color: #F2F2F7;
+            font-family: -apple-system;
+            background: #F2F2F7;
         }
 
         h1 {
-            font-size: 32px;
-            font-weight: 700;
-            color: #1C1C1E;
-            margin-bottom: 20px;
             text-align: center;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: auto;
-        }
-
-        .day-card {
-            background: white;
-            padding: 18px;
-            border-radius: 16px;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.06);
-            border: 1px solid #E5E5EA;
+            font-size: 30px;
             margin-bottom: 25px;
+            font-weight: 700;
         }
 
-        .day-title {
-            font-size: 24px;
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 18px;
+            max-width: 600px;
+            margin: auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        label {
+            font-size: 18px;
             font-weight: 600;
-            margin-bottom: 15px;
-            color: #1C1C1E;
+            margin-top: 20px;
+            display: block;
         }
 
-        .meal-block {
-            background: #FAFAFA;
-            padding: 14px;
+        select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            margin-top: 5px;
+            border: 1px solid #CCC;
             border-radius: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #E5E5EA;
         }
 
-        .meal-name {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: #1C1C1E;
-        }
-
-        .recipe-name {
-            font-size: 17px;
-            margin-bottom: 10px;
-        }
-
-        .btn {
+        button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 30px;
             background: #007AFF;
-            padding: 10px 14px;
-            border-radius: 12px;
+            border-radius: 14px;
             color: white;
             border: none;
-            font-size: 16px;
-            cursor: pointer;
-            margin-right: 6px;
-            margin-bottom: 6px;
-        }
-
-        .btn-danger {
-            background: #FF3B30;
-        }
-
-        .done-label {
-            margin-top: 10px;
-            padding: 10px;
-            background: #34C759;
-            color: white;
-            text-align: center;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .assign-block {
-            text-align: center;
-            padding: 15px;
-            background: #FAFAFA;
-            border-radius: 12px;
-            border: 1px solid #E5E5EA;
-            margin-bottom: 15px;
-        }
-
-        .assign-block .btn {
-            width: 100%;
+            font-size: 18px;
+            font-weight: 700;
         }
     </style>
-
 </head>
 
 <body>
 
-<h1>Planner Settimanale</h1>
+<h1>Aggiungi al Planner</h1>
 
-<div class="container">
+<div class="card">
+    <form method="POST">
 
-    {% for day in planner %}
-        <div class="day-card">
-            <div class="day-title">{{ day.day }}</div>
+        <label>Giorno</label>
+        <select name="day">
+            {% for d in days %}
+                <option value="{{ d }}">{{ d }}</option>
+            {% endfor %}
+        </select>
 
-            <!-- PRANZO -->
-            <div class="meal-block">
-                <div class="meal-name">🍽️ Pranzo</div>
+        <label>Pranzo</label>
+        <select name="meal" style="display:none">
+            <option value="pranzo" selected></option>
+        </select>
+        <select name="recipe_id">
+            <option value="">— Nessuna —</option>
+            {% for r in recipes %}
+                <option value="{{ r.id }}">{{ r.name }}</option>
+            {% endfor %}
+        </select>
 
-                {% if day.lunch.recipe_name %}
-                    <div class="recipe-name"><strong>Ricetta:</strong> {{ day.lunch.recipe_name }}</div>
+        <label>Cena</label>
+        <select name="recipe_id">
+            <option value="">— Nessuna —</option>
+            {% for r in recipes %}
+                <option value="{{ r.id }}">{{ r.name }}</option>
+            {% endfor %}
+        </select>
 
-                    <!-- Azioni -->
-                    <form style="display:inline;" method="POST" action="/remove_meal">
-                        <input type="hidden" name="entry_id" value="{{ day.lunch.id }}">
-                        <button class="btn btn-danger">Rimuovi</button>
-                    </form>
-
-                {% else %}
-                    <!-- Nessuna ricetta → mostra pulsante "Assegna" -->
-                    <div class="assign-block">
-                        Nessuna ricetta assegnata
-                        <form method="GET" action="/recipes">
-                            <input type="hidden" name="assign_day" value="{{ day.day }}">
-                            <input type="hidden" name="assign_meal" value="pranzo">
-                            <button class="btn">Assegna ricetta</button>
-                        </form>
-                    </div>
-                {% endif %}
-
-                <!-- STATO FATTO/NON FATTO -->
-                {% if day.lunch.recipe_name %}
-                    {% if not day.lunch.done %}
-                        <form method="POST" action="/mark_done">
-                            <input type="hidden" name="entry_id" value="{{ day.lunch.id }}">
-                            <button class="btn" style="width:100%;">Segna come fatto ✓</button>
-                        </form>
-                    {% else %}
-                        <div class="done-label">✓ Completato</div>
-                    {% endif %}
-                {% endif %}
-            </div>
-
-            <!-- CENA -->
-            <div class="meal-block">
-                <div class="meal-name">🌙 Cena</div>
-
-                {% if day.dinner.recipe_name %}
-                    <div class="recipe-name"><strong>Ricetta:</strong> {{ day.dinner.recipe_name }}</div>
-
-                    <!-- Azioni -->
-                    <form style="display:inline;" method="POST" action="/remove_meal">
-                        <input type="hidden" name="entry_id" value="{{ day.dinner.id }}">
-                        <button class="btn btn-danger">Rimuovi</button>
-                    </form>
-
-                {% else %}
-                    <div class="assign-block">
-                        Nessuna ricetta assegnata
-                        <form method="GET" action="/recipes">
-                            <input type="hidden" name="assign_day" value="{{ day.day }}">
-                            <input type="hidden" name="assign_meal" value="cena">
-                            <button class="btn">Assegna ricetta</button>
-                        </form>
-                    </div>
-                {% endif %}
-
-                <!-- STATO FATTO/NON FATTO -->
-                {% if day.dinner.recipe_name %}
-                    {% if not day.dinner.done %}
-                        <form method="POST" action="/mark_done">
-                            <input type="hidden" name="entry_id" value="{{ day.dinner.id }}">
-                            <button class="btn" style="width:100%;">Segna come fatto ✓</button>
-                        </form>
-                    {% else %}
-                        <div class="done-label">✓ Completato</div>
-                    {% endif %}
-                {% endif %}
-            </div>
-
-        </div>
-    {% endfor %}
+        <button type="submit">Salva</button>
+    </form>
 </div>
 
 </body>
