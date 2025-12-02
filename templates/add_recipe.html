@@ -56,14 +56,44 @@
             border-radius: 12px;
         }
 
-        /* NAVBAR */
-        .navbar { position: fixed; bottom: 0; left: 0; right: 0; height: 95px;
-            background: #FFF; border-radius: 20px 20px 0 0;
-            border-top: 1px solid #E5E5EA; box-shadow: 0 -4px 14px rgba(0,0,0,0.20);
-            display: flex; justify-content: space-around; align-items: center; }
-        .nav-item { width: 25%; text-align: center; text-decoration: none; color: #007AFF; font-weight: 700; }
-        .nav-item .icon { font-size: 28px; display: block; }
-        .nav-item .label { font-size: 14px; margin-top: 3px; }
+        /* NAVBAR STILE IPHONE */
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+
+            height: 95px;
+            background: #FFFFFF;
+
+            border-radius: 20px 20px 0 0;
+            border-top: 1px solid #E5E5EA;
+            box-shadow: 0 -4px 14px rgba(0,0,0,0.20);
+
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+
+            z-index: 999;
+        }
+
+        .nav-item {
+            width: 25%;
+            text-align: center;
+            text-decoration: none;
+            color: #007AFF;
+            font-weight: 700;
+        }
+
+        .nav-item .icon {
+            font-size: 28px;
+            display: block;
+        }
+
+        .nav-item .label {
+            font-size: 14px;
+            margin-top: 3px;
+        }
     </style>
 </head>
 
@@ -85,10 +115,25 @@
 
 <!-- NAVBAR -->
 <div class="navbar">
-    <a href="/food-planner" class="nav-item"><span class="icon">🏠</span><span class="label">Home</span></a>
-    <a href="/recipes" class="nav-item"><span class="icon">📚</span><span class="label">Ricette</span></a>
-    <a href="/food-planner/add" class="nav-item"><span class="icon">➕</span><span class="label">Aggiungi</span></a>
-    <a href="/shopping_list" class="nav-item"><span class="icon">🛒</span><span class="label">Spesa</span></a>
+    <a href="/food-planner" class="nav-item">
+        <span class="icon">🏠</span>
+        <span class="label">Home</span>
+    </a>
+
+    <a href="/recipes" class="nav-item">
+        <span class="icon">📚</span>
+        <span class="label">Ricette</span>
+    </a>
+
+    <a href="/food-planner/add" class="nav-item">
+        <span class="icon">➕</span>
+        <span class="label">Aggiungi</span>
+    </a>
+
+    <a href="/shopping_list" class="nav-item">
+        <span class="icon">🛒</span>
+        <span class="label">Spesa</span>
+    </a>
 </div>
 
 </body>
