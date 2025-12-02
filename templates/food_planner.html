@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Food Planner</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<h1 style="text-align:center;">Food Planner Settimanale</h1>
+
+<div class="week-container">
+
+    {% for key, label in days %}
+    <div class="day-box">
+        <h2>{{ label }}</h2>
+
+        <p><strong>Pranzo:</strong> {{ plan[key][2] if key in plan else "—" }}</p>
+        <a href="/edit-meal?day={{ key }}&meal=lunch" class="btn">Aggiungi/Modifica</a>
+
+        <br><br>
+
+        <p><strong>Cena:</strong> {{ plan[key][3] if key in plan else "—" }}</p>
+        <a href="/edit-meal?day={{ key }}&meal=dinner" class="btn">Aggiungi/Modifica</a>
+
+        <br><br>
+
+        {% if key in plan %}
+            <a href="/mark-done?day={{ key }}" class="btn-small">
+                Segna come FATTO
+            </a>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+</div>
+
+</body>
+</html>
