@@ -102,14 +102,16 @@
 <h1>Nuova Ricetta</h1>
 
 <div class="card">
-    <form method="POST">
+    <form method="POST" action="/add_recipe">
+
         <label>Nome Ricetta</label>
         <input type="text" name="name" required>
 
         <label>Ingredienti</label>
         <textarea name="ingredients" rows="6" required></textarea>
 
-        <button type="submit">Salva</button>
+        <button type="submit" class="btn-save">Salva</button>
+
     </form>
 </div>
 
