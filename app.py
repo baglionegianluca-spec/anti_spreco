@@ -5,6 +5,8 @@ from scheduler import setup_scheduler
 from db import get_db, add_product, get_all_products
 from dotenv import load_dotenv
 
+
+
 # --- FOOD PLANNER IMPORT ---
 from db_foodplanner import (
     init_foodplanner_tables,
@@ -13,7 +15,8 @@ from db_foodplanner import (
     assign_recipe,
     get_day_plan,
     remove_planned_recipe,
-    mark_meal_done
+    mark_meal_done,
+    get_recipe_by_id
 )
 
 
