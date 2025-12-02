@@ -416,27 +416,23 @@ def delete_product(product_id):
 @app.route("/food-planner")
 @login_required
 def food_planner():
-    import datetime
-    
-    today = datetime.date.today()
-    monday = today - datetime.timedelta(days=today.weekday())
-
-    days_names = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"]
+    days_names = ["lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"]
     week = {}
 
     for i in range(7):
-        d = monday + datetime.timedelta(days=i)
-        day_plan = get_day_plan(d)
+        day_name = days_names[i]
+        day_plan = get_day_plan(day_name)
 
-        lunch = next((x["recipe_name"] for x in day_plan if x["meal_type"] == "pranzo"), None)
-        dinner = next((x["recipe_name"] for x in day_plan if x["meal_type"] == "cena"), None)
+        lunch = next((x["recipe_name"] for x in day_plan if x["meal_type"] == "lunch"), None)
+        dinner = next((x["recipe_name"] for x in day_plan if x["meal_type"] == "dinner"), None)
 
-        week[days_names[i]] = {
+        week[day_name.capitalize()] = {
             "lunch": lunch or "—",
             "dinner": dinner or "—"
         }
 
     return render_template("food_planner.html", week=week)
+
 
 
 # ============================
