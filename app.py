@@ -273,15 +273,15 @@ def add():
         if product_id:
             cur.execute("""
                 UPDATE products SET
-                    name=?, barcode=?, brand=?, category=?, image_url=?,
-                    quantity=?, expiry_date=?
-                WHERE id=?
+                    name=%s, barcode=%s, brand=%s, category=%s, image_url=%s,
+                    quantity=%S, expiry_date=%s
+                WHERE id=%s
             """, (name, barcode, brand, category, image_url, quantity, expiry_date, product_id))
         else:
             cur.execute("""
                 INSERT INTO products
                 (name, barcode, brand, category, image_url, quantity, expiry_date)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
             """, (name, barcode, brand, category, image_url, quantity, expiry_date))
 
         conn.commit()
@@ -299,7 +299,7 @@ def add():
     # ---------------------------------------------------
     product = None
     if product_id:
-        cur.execute("SELECT * FROM products WHERE id=?", (product_id,))
+        cur.execute("SELECT * FROM products WHERE id=%s", (product_id,))
         product = cur.fetchone()
 
     # ---------------------------------------------------
@@ -393,7 +393,7 @@ def barcode_lookup():
 def delete_product(product_id):
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("DELETE FROM products WHERE id = ?", (product_id,))
+    cur.execute("DELETE FROM products WHERE id = %s", (product_id,))
     conn.commit()
     return redirect(url_for("products"))
 
