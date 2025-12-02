@@ -131,7 +131,6 @@ def get_ingredients(recipe_id):
 # ============================
 
 def get_day_plan(day_text):
-    """Ritorna il piano per un giorno (es: 'lunedì')."""
     conn = get_db()
     cur = conn.cursor()
 
@@ -139,12 +138,15 @@ def get_day_plan(day_text):
         SELECT 
             mp.id,
             mp.meal_type,
-            mp.recipe_id,
+            mp.first_course_id,
+            mp.second_course_id,
+            r1.name AS first_course_name,
+            r2.name AS second_course_name,
             mp.custom_note,
-            mp.is_done,
-            r.name AS recipe_name
+            mp.is_done
         FROM meal_plan_entries mp
-        LEFT JOIN recipes r ON mp.recipe_id = r.id
+        LEFT JOIN recipes r1 ON mp.first_course_id = r1.id
+        LEFT JOIN recipes r2 ON mp.second_course_id = r2.id
         WHERE mp.day_date = %s
         ORDER BY mp.meal_type;
     """, (day_text,))
@@ -154,19 +156,19 @@ def get_day_plan(day_text):
     return rows
 
 
-def assign_recipe(day_text, meal_type, recipe_id):
-    """Inserisce o aggiorna il pasto del giorno dato (giorno TEXT)."""
+def assign_recipe(day_text, meal_type, first_id=None, second_id=None):
     conn = get_db()
     cur = conn.cursor()
 
     cur.execute("""
-        INSERT INTO meal_plan_entries (day_date, meal_type, recipe_id)
-        VALUES (%s, %s, %s)
+        INSERT INTO meal_plan_entries (day_date, meal_type, first_course_id, second_course_id)
+        VALUES (%s, %s, %s, %s)
         ON CONFLICT (day_date, meal_type) DO UPDATE
-        SET recipe_id = EXCLUDED.recipe_id,
+        SET first_course_id = EXCLUDED.first_course_id,
+            second_course_id = EXCLUDED.second_course_id,
             is_done = FALSE,
             custom_note = NULL;
-    """, (day_text, meal_type, recipe_id))
+    """, (day_text, meal_type, first_id, second_id))
 
     conn.commit()
     conn.close()

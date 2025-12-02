@@ -416,19 +416,25 @@ def delete_product(product_id):
 @app.route("/food-planner")
 @login_required
 def food_planner():
+
     days_names = ["lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"]
     week = {}
 
-    for i in range(7):
-        day_name = days_names[i]
-        day_plan = get_day_plan(day_name)
+    for day in days_names:
+        day_plan = get_day_plan(day)
 
-        lunch = next((x["recipe_name"] for x in day_plan if x["meal_type"] == "lunch"), None)
-        dinner = next((x["recipe_name"] for x in day_plan if x["meal_type"] == "dinner"), None)
+        # Estrai i 4 campi
+        lunch_first = next((x["recipe_name"] for x in day_plan if x["meal_type"] == "lunch_first"), None)
+        lunch_second = next((x["recipe_name"] for x in day_plan if x["meal_type"] == "lunch_second"), None)
 
-        week[day_name.capitalize()] = {
-            "lunch": lunch or "—",
-            "dinner": dinner or "—"
+        dinner_first = next((x["recipe_name"] for x in day_plan if x["meal_type"] == "dinner_first"), None)
+        dinner_second = next((x["recipe_name"] for x in day_plan if x["meal_type"] == "dinner_second"), None)
+
+        week[day.capitalize()] = {
+            "lunch_first": lunch_first,
+            "lunch_second": lunch_second,
+            "dinner_first": dinner_first,
+            "dinner_second": dinner_second
         }
 
     return render_template("food_planner.html", week=week)
@@ -442,18 +448,21 @@ def food_planner():
 @app.route("/food-planner/add", methods=["GET", "POST"])
 @login_required
 def add_foodplanner():
+
     if request.method == "POST":
         day = request.form.get("day")
-        lunch_id = request.form.get("lunch_recipe_id")
-        dinner_id = request.form.get("dinner_recipe_id")
 
-        # SALVA PRANZO
-        if lunch_id:
-            assign_recipe(day, "lunch", lunch_id)
+        lunch_first_id = request.form.get("lunch_first_id")
+        lunch_second_id = request.form.get("lunch_second_id")
 
-        # SALVA CENA
-        if dinner_id:
-            assign_recipe(day, "dinner", dinner_id)
+        dinner_first_id = request.form.get("dinner_first_id")
+        dinner_second_id = request.form.get("dinner_second_id")
+
+        # Salva o aggiorna i campi (possono essere vuoti)
+        assign_recipe(day, "lunch_first", lunch_first_id)
+        assign_recipe(day, "lunch_second", lunch_second_id)
+        assign_recipe(day, "dinner_first", dinner_first_id)
+        assign_recipe(day, "dinner_second", dinner_second_id)
 
         return redirect(url_for("food_planner"))
 

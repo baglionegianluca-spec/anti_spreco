@@ -9,7 +9,7 @@
         body {
             margin: 0;
             padding: 20px;
-            padding-bottom: 140px; /* spazio per navbar */
+            padding-bottom: 140px;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
             background: #F2F2F7;
         }
@@ -62,24 +62,19 @@
             cursor: pointer;
         }
 
-        /* 🎯 NAVBAR MODERNA */
         .navbar {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-
             height: 95px;
             background: #FFFFFF;
-
             border-radius: 20px 20px 0 0;
             border-top: 1px solid #E5E5EA;
             box-shadow: 0 -4px 14px rgba(0,0,0,0.20);
-
             display: flex;
             justify-content: space-around;
             align-items: center;
-
             z-index: 999;
         }
 
@@ -110,7 +105,7 @@
 <div class="card">
     <form method="POST">
 
-        <!-- Giorno -->
+        <!-- GIORNO -->
         <label>Giorno</label>
         <select name="day">
             {% for d in days %}
@@ -118,19 +113,37 @@
             {% endfor %}
         </select>
 
-        <!-- Pranzo -->
-        <label>Pranzo</label>
-        <select name="lunch_recipe_id">
-            <option value="">— Nessuna —</option>
+        <!-- PRANZO - PRIMO -->
+        <label>Pranzo — Primo</label>
+        <select name="lunch_first_id">
+            <option value="">— Nessuno —</option>
             {% for r in recipes %}
             <option value="{{ r.id }}">{{ r.name }}</option>
             {% endfor %}
         </select>
 
-        <!-- Cena -->
-        <label>Cena</label>
-        <select name="dinner_recipe_id">
-            <option value="">— Nessuna —</option>
+        <!-- PRANZO — SECONDO -->
+        <label>Pranzo — Secondo</label>
+        <select name="lunch_second_id">
+            <option value="">— Nessuno —</option>
+            {% for r in recipes %}
+            <option value="{{ r.id }}">{{ r.name }}</option>
+            {% endfor %}
+        </select>
+
+        <!-- CENA - PRIMO -->
+        <label>Cena — Primo</label>
+        <select name="dinner_first_id">
+            <option value="">— Nessuno —</option>
+            {% for r in recipes %}
+            <option value="{{ r.id }}">{{ r.name }}</option>
+            {% endfor %}
+        </select>
+
+        <!-- CENA — SECONDO -->
+        <label>Cena — Secondo</label>
+        <select name="dinner_second_id">
+            <option value="">— Nessuno —</option>
             {% for r in recipes %}
             <option value="{{ r.id }}">{{ r.name }}</option>
             {% endfor %}
@@ -138,10 +151,9 @@
 
         <button class="btn-save">Salva</button>
     </form>
-
 </div>
 
-<!-- NAVBAR UGUALE A TUTTE LE ALTRE -->
+<!-- NAVBAR -->
 <div class="navbar">
     <a href="/food-planner" class="nav-item">
         <span class="icon">🏠</span>
