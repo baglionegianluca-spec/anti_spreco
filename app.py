@@ -6,7 +6,7 @@ from db import get_db, add_product, get_all_products
 from dotenv import load_dotenv
 
 
-# force redeploy
+# force redeploy 2.0
 
 # --- FOOD PLANNER IMPORT ---
 from db_foodplanner import (
