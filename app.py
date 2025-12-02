@@ -444,19 +444,26 @@ def food_planner():
 
 @app.route("/food-planner/add", methods=["GET", "POST"])
 @login_required
-def food_planner_add():
-    days = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"]
-    recipes = get_all_recipes()
-
+def add_foodplanner():
     if request.method == "POST":
-        day = request.form["day"]
-        meal = request.form["meal"]       # pranzo / cena
-        recipe_id = request.form["recipe_id"]
+        day = request.form.get("day")
+        lunch_id = request.form.get("lunch_recipe_id")
+        dinner_id = request.form.get("dinner_recipe_id")
 
-        assign_recipe_to_day(day, meal, recipe_id)
+        # SALVA PRANZO
+        if lunch_id:
+            assign_recipe(day, "lunch", lunch_id)
+
+        # SALVA CENA
+        if dinner_id:
+            assign_recipe(day, "dinner", dinner_id)
+
         return redirect(url_for("food_planner"))
 
-    return render_template("planner.html", days=days, recipes=recipes)
+    days = ["lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"]
+    recipes = get_all_recipes()
+
+    return render_template("planner_add.html", days=days, recipes=recipes)
 
 
 # ============================

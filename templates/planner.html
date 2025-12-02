@@ -120,8 +120,8 @@
 
         <!-- Pranzo -->
         <label>Pranzo</label>
-        <select name="meal" id="meal" onchange="document.getElementById('meal_hidden').value=this.value;">
-            <option value="pranzo">— Nessuna —</option>
+        <select name="lunch_recipe_id">
+            <option value="">— Nessuna —</option>
             {% for r in recipes %}
             <option value="{{ r.id }}">{{ r.name }}</option>
             {% endfor %}
@@ -129,8 +129,8 @@
 
         <!-- Cena -->
         <label>Cena</label>
-        <select name="meal_cena">
-            <option value="cena">— Nessuna —</option>
+        <select name="dinner_recipe_id">
+            <option value="">— Nessuna —</option>
             {% for r in recipes %}
             <option value="{{ r.id }}">{{ r.name }}</option>
             {% endfor %}
@@ -138,6 +138,7 @@
 
         <button class="btn-save">Salva</button>
     </form>
+
 </div>
 
 <!-- NAVBAR UGUALE A TUTTE LE ALTRE -->
