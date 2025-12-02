@@ -8,6 +8,7 @@
         body {
             margin: 0;
             padding: 20px;
+            padding-bottom: 110px; /* SAFE AREA per non coprire il contenuto con la navbar */
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
             background-color: #F2F2F7;
         }
@@ -72,6 +73,34 @@
             .day-card { padding: 16px; }
             .meal-box { flex-direction: column; gap: 6px; }
         }
+
+        /* NAVBAR IN BASSO STILE iOS */
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+
+            background: #FFFFFF;
+            padding: 12px 0;
+            border-radius: 20px 20px 0 0;
+
+            box-shadow: 0 -4px 14px rgba(0,0,0,0.18);
+            border-top: 1px solid #E5E5EA;
+
+            z-index: 999;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: #007AFF;
+            font-size: 17px;
+            font-weight: 600;
+        }
     </style>
 </head>
 
@@ -81,19 +110,12 @@
 
 <div class="week-container">
 
-    {# ------------------------------------------
-       Raggruppiamo i risultati per giorno
-    ------------------------------------------- #}
-
     {% set grouped = {} %}
     {% for entry in week %}
         {% set day = entry.day_date|string %}
         {% if day not in grouped %}
             {% set _ = grouped.update({
-                day: {
-                    "lunch": None,
-                    "dinner": None
-                }
+                day: {"lunch": None, "dinner": None}
             }) %}
         {% endif %}
 
@@ -103,10 +125,6 @@
             {% set _ = grouped[day].update({"dinner": entry.recipe_name}) %}
         {% endif %}
     {% endfor %}
-
-    {# ------------------------------------------
-       STAMPA LA SETTIMANA
-    ------------------------------------------- #}
 
     {% for day, meals in grouped.items() %}
     <div class="day-card">
@@ -137,6 +155,14 @@
     </div>
     {% endfor %}
 
+</div>
+
+<!-- NAVBAR FISSA IN BASSO -->
+<div class="navbar">
+    <a href="/dashboard">🏠 Home</a>
+    <a href="/recipes">📚 Ricette</a>
+    <a href="/add_recipe">➕ Nuova Ricetta</a>
+    <a href="/shopping_list">🛒 Lista Spesa</a>
 </div>
 
 </body>
