@@ -463,7 +463,7 @@ def add_foodplanner():
     days = ["lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"]
     recipes = get_all_recipes()
 
-    return render_template("planner_add.html", days=days, recipes=recipes)
+    return render_template("planner.html", days=days, recipes=recipes)
 
 
 # ============================
