@@ -4,7 +4,7 @@ import os
 from scheduler import setup_scheduler
 from db import get_db, add_product, get_all_products
 from dotenv import load_dotenv
-
+from fpdf import FPDF
 
 # force redeploy 2.0
 
@@ -443,6 +443,56 @@ def food_planner():
             }
 
     return render_template("food_planner.html", week=week)
+
+
+
+
+@app.route("/food-planner/pdf")
+@login_required
+def food_planner_pdf():
+    days_query = ["lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"]
+    days_display = ["Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato","Domenica"]
+
+    # Recupera i dati dal DB
+    week = {}
+    for i, day_db in enumerate(days_query):
+        day_plan = get_day_plan(day_db)
+        week[days_display[i]] = {
+            "lunch_first": day_plan.get("lunch_first_name") if day_plan else "",
+            "lunch_second": day_plan.get("lunch_second_name") if day_plan else "",
+            "dinner_first": day_plan.get("dinner_first_name") if day_plan else "",
+            "dinner_second": day_plan.get("dinner_second_name") if day_plan else "",
+        }
+
+    # ======== CREA IL PDF ========
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=14)
+
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font("Arial", "B", 18)
+    pdf.cell(0, 10, "Planner Settimanale", ln=True, align="C")
+    pdf.ln(4)
+
+    pdf.set_font("Arial", size=12)
+
+    for day, meals in week.items():
+        pdf.set_font("Arial", "B", 14)
+        pdf.cell(0, 8, day, ln=True)
+        
+        pdf.set_font("Arial", size=12)
+        pdf.cell(0, 7, f"- Pranzo (Primo): {meals['lunch_first'] or '—'}", ln=True)
+        pdf.cell(0, 7, f"- Pranzo (Secondo): {meals['lunch_second'] or '—'}", ln=True)
+        pdf.cell(0, 7, f"- Cena (Primo): {meals['dinner_first'] or '—'}", ln=True)
+        pdf.cell(0, 7, f"- Cena (Secondo): {meals['dinner_second'] or '—'}", ln=True)
+        
+        pdf.ln(4)
+
+    # Output PDF
+    return pdf.output(dest="S").encode("latin-1"), 200, {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": "attachment; filename=planner_settimanale.pdf"
+    }
 
 
 
