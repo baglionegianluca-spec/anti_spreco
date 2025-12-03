@@ -91,42 +91,43 @@ def get_all_recipes():
     return rows
 
 
-def add_recipe(name, ingredients):
+def add_recipe(name, ingredients_text):
     conn = get_db()
     cur = conn.cursor()
-    json_ingredients = json.dumps({"text": ingredients})
+
     cur.execute("""
         INSERT INTO recipes (name, notes)
         VALUES (%s, %s)
-    """, (name, json_ingredients))
+    """, (name, ingredients_text))
+
     conn.commit()
     cur.close()
     conn.close()
+
 
 
 def get_recipe_by_id(recipe_id):
     conn = get_db()
     cur = conn.cursor()
 
-    # --- Ricetta base ---
     cur.execute("""
-        SELECT id, name, notes, ingredients
+        SELECT id, name, notes
         FROM recipes
         WHERE id = %s
     """, (recipe_id,))
+
     row = cur.fetchone()
+    conn.close()
 
     if not row:
         return None
 
-    recipe = {
-        "id": row[0],
-        "name": row[1],
-        "notes": row[2] or "",
-        "ingredients_structured": row[3] or []
+    return {
+        "id": row["id"],
+        "name": row["name"],
+        "notes": row["notes"] or ""
     }
 
-    return recipe
 
 
 
