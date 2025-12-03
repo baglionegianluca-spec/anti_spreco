@@ -6,7 +6,7 @@ from db import get_db, add_product, get_all_products
 from dotenv import load_dotenv
 from fpdf import FPDF
 from psycopg2.extras import RealDictCursor
-
+from markupsafe import Markup
 
 # force redeploy 3.0
 
@@ -31,6 +31,14 @@ load_dotenv()
 init_foodplanner_tables()
 
 app = Flask(__name__)
+
+@app.template_filter('nl2br')
+def nl2br_filter(s):
+    if not s:
+        return ""
+    return Markup(s.replace("\n", "<br>"))
+
+
 app.secret_key = os.getenv("SECRET_KEY", "chiave-segreta-cambia-questa")
 
 APP_PASSWORD = os.getenv("APP_PASSWORD", "1234")
