@@ -489,7 +489,7 @@ def food_planner_pdf():
         pdf.ln(4)
 
     # Output PDF
-    return pdf.output(dest="S").encode("latin-1"), 200, {
+    return bytes(pdf.output(dest="S")), 200, {
         "Content-Type": "application/pdf",
         "Content-Disposition": "attachment; filename=planner_settimanale.pdf"
     }
