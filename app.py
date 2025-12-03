@@ -7,7 +7,8 @@ from dotenv import load_dotenv
 from fpdf import FPDF
 from psycopg2.extras import RealDictCursor
 from markupsafe import Markup
-
+import re
+import unicodedata
 # force redeploy 3.0
 
 # --- FOOD PLANNER IMPORT ---
@@ -101,6 +102,28 @@ def logout():
 @login_required
 def dashboard():
     return render_template("menu.html")
+
+
+
+
+
+# ============================
+#   EMOTICON NO 
+# ============================
+def strip_unsupported_chars(text):
+    """Rimuove emoji e caratteri fuori dal range Latin-1 per FPDF."""
+    output = ""
+    for ch in text:
+        try:
+            ch.encode("latin-1")  # se fallisce → carattere non supportato
+            output += ch
+        except UnicodeEncodeError:
+            continue
+    return output
+
+
+
+
 
 
 # ============================
