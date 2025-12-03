@@ -45,6 +45,30 @@
             color: #007AFF;
             text-decoration: none;
         }
+
+        .ingredient-list {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 10px;
+        }
+
+        .ingredient-list li {
+            font-size: 20px;
+            margin-bottom: 10px;
+            padding-left: 22px;
+            position: relative;
+        }
+
+        .ingredient-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: #007AFF; /* blu stile iOS */
+            font-size: 24px;
+            line-height: 22px;
+        }
+
     </style>
 </head>
 
@@ -54,9 +78,11 @@
     <h1>{{ recipe.name }}</h1>
 
     <h2>Ingredienti</h2>
-    <div class="notes">
-        {{ recipe.notes | nl2br }}
-    </div>
+    <ul class="ingredient-list">
+    {% for line in recipe.notes.split('\n') if line.strip() %}
+        <li>{{ line.strip() }}</li>
+    {% endfor %}
+    </ul>
 </div>
 
 <form method="POST" action="/recipe/{{ recipe.id }}/delete" 
