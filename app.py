@@ -498,59 +498,70 @@ def food_planner_pdf():
     pdf.cell(0, 14, "Meal Planner Settimanale", ln=True, align="C", fill=True)
     pdf.ln(4)
 
-    # === TABELLA DEFINITIVA ===
+    # === TABELLA A PIENO FOGLIO ===
 
-    col_day = 30
-    col_lunch = 70
-    col_dinner = 70
-    row_height = 10
+    col_day = 35
+    col_lunch = 75
+    col_dinner = 75
+
+    # Altezza totale disponibile
+    page_height = 297
+    top_margin = 40
+    bottom_margin = 10
+    available_height = page_height - top_margin - bottom_margin
+
+    rows = 7
+    row_height = available_height / rows  # ~ 35-36mm
 
     # Header colonne
-    pdf.set_y(35)
+    pdf.set_y(top_margin - 10)
     pdf.set_font("Arial", "B", 12)
     pdf.set_fill_color(220, 220, 220)
-    pdf.cell(col_day, row_height, "Giorno", 1, 0, "C", True)
-    pdf.cell(col_lunch, row_height, "Pranzo", 1, 0, "C", True)
-    pdf.cell(col_dinner, row_height, "Cena", 1, 1, "C", True)
+    pdf.cell(col_day, 10, "Giorno", 1, 0, "C", True)
+    pdf.cell(col_lunch, 10, "Pranzo", 1, 0, "C", True)
+    pdf.cell(col_dinner, 10, "Cena", 1, 1, "C", True)
 
-    pdf.set_font("Arial", size=9)
+    pdf.set_font("Arial", size=10)
+
+    y_start = top_margin
 
     toggle = False
-    y_start = 35 + row_height
 
     for day in days_order:
         d = week[day]
 
-        # Colori riga alternata
+        # Alternanza riga
         if toggle:
             row_bg = (245, 245, 245)
         else:
             row_bg = (255, 255, 255)
         toggle = not toggle
 
-        # === 1) SALVA POSIZIONE RIGA ===
+        # Memorizza Y della riga
         row_y = y_start
 
-        # COLORE SFONDO RIGA
+        # Giorno
         pdf.set_fill_color(*row_bg)
-
-        # === 2) Giorno ===
         pdf.set_xy(10, row_y)
         pdf.cell(col_day, row_height, day.capitalize(), 1, 0, "C", True)
 
-        # === 3) PRANZO ===
+        # PRANZO
+        pdf.set_fill_color(220, 238, 255)
         pdf.set_xy(10 + col_day, row_y)
-        pdf.set_fill_color(220, 238, 255)  # celeste
-        lunch_text = f"1º: {d['lunch_first']}\n2º: {d['lunch_second']}"
-        pdf.multi_cell(col_lunch, row_height/2, lunch_text, border=1, fill=True)
+        pdf.multi_cell(col_lunch, row_height / 2,
+            f"1º: {d['lunch_first']}\n2º: {d['lunch_second']}",
+            border=1, fill=True
+        )
 
-        # === 4) CENA (ripartenza fissa) ===
+        # Cena
+        pdf.set_fill_color(223, 255, 226)
         pdf.set_xy(10 + col_day + col_lunch, row_y)
-        pdf.set_fill_color(223, 255, 226)  # verde
-        dinner_text = f"1º: {d['dinner_first']}\n2º: {d['dinner_second']}"
-        pdf.multi_cell(col_dinner, row_height/2, dinner_text, border=1, fill=True)
+        pdf.multi_cell(col_dinner, row_height / 2,
+            f"1º: {d['dinner_first']}\n2º: {d['dinner_second']}",
+            border=1, fill=True
+        )
 
-        # === 5) PASSA ALLA RIGA SUCCESSIVA ===
+        # Vai alla riga successiva
         y_start += row_height
 
     # Output finale
