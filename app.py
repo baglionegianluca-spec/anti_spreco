@@ -642,12 +642,20 @@ def add_recipe_route():
 @app.route("/recipe/<int:recipe_id>")
 @login_required
 def recipe_detail(recipe_id):
-    recipe = get_recipe_by_id(recipe_id)
+    recipe = get_recipe(recipe_id)
 
-    # ingredients è già un dict → lo leggiamo direttamente
-    ingredients = recipe["ingredients"]["text"]
+    # ingredienti testuali
+    notes = recipe.get("notes", "") or ""
 
-    return render_template("recipe_detail.html", recipe=recipe, ingredients=ingredients)
+    # ingredienti strutturati
+    ingredients_list = recipe.get("ingredients", [])
+
+    return render_template(
+        "recipe_detail.html",
+        recipe=recipe,
+        notes=notes,
+        ingredients_list=ingredients_list
+    )
 
 
 @app.route("/recipe/<int:recipe_id>/delete", methods=["POST"])
