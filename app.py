@@ -453,31 +453,45 @@ def food_planner_pdf():
     conn = get_db()
     cur = conn.cursor()
 
-    cur.execute("""
-        SELECT day, lunch_first, lunch_second, dinner_first, dinner_second
-        FROM meal_planner_week
-        ORDER BY sort_order
-    """)
-    
-    rows = cur.fetchall()
+    # Recupera la settimana nell'ordine corretto
+    days_order = ["lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"]
 
-    # Organizza la settimana in lista
-    week = []
+    cur.execute("""
+        SELECT 
+            mp.day_date,
+            r1.name AS lunch_first,
+            r2.name AS lunch_second,
+            r3.name AS dinner_first,
+            r4.name AS dinner_second
+        FROM meal_plan_entries mp
+        LEFT JOIN recipes r1 ON mp.lunch_first_recipe_id = r1.id
+        LEFT JOIN recipes r2 ON mp.lunch_second_recipe_id = r2.id
+        LEFT JOIN recipes r3 ON mp.dinner_first_recipe_id = r3.id
+        LEFT JOIN recipes r4 ON mp.dinner_second_recipe_id = r4.id;
+    """)
+
+    rows = cur.fetchall()
+    conn.close()
+
+    # Dizionario giorno → pasti
+    week = {day: {"lunch_first": "-",
+                  "lunch_second": "-",
+                  "dinner_first": "-",
+                  "dinner_second": "-"} for day in days_order}
+
     for row in rows:
-        week.append({
-            "day": row[0],
-            "lunch_first": row[1] or "-",
-            "lunch_second": row[2] or "-",
-            "dinner_first": row[3] or "-",
-            "dinner_second": row[4] or "-",
-        })
+        day = row["day_date"]
+        if day in week:
+            week[day]["lunch_first"] = row["lunch_first"] or "-"
+            week[day]["lunch_second"] = row["lunch_second"] or "-"
+            week[day]["dinner_first"] = row["dinner_first"] or "-"
+            week[day]["dinner_second"] = row["dinner_second"] or "-"
 
     # === PDF ===
     pdf = FPDF(orientation="P", unit="mm", format="A4")
     pdf.set_auto_page_break(auto=False)
     pdf.add_page()
 
-    # Margini
     pdf.set_margins(10, 10, 10)
 
     # Titolo
@@ -485,20 +499,18 @@ def food_planner_pdf():
     pdf.cell(0, 10, "Meal Planner Settimanale", ln=True, align="C")
     pdf.ln(3)
 
-    # Font tabella
+    # Tabella 2 colonne
     pdf.set_font("Arial", size=11)
 
-    # Due colonne: sinistra 100mm, destra 100mm
     col_width = 95
-    row_height = 6
-
-    # Layout: 2 colonne × 4 righe
     x_left = 10
     x_right = 110
     y = 25
 
-    for i, d in enumerate(week):
-        # scegli colonna
+    for i, day in enumerate(days_order):
+        d = week[day]
+
+        # Prima metà colonne
         if i < 4:
             x = x_left
             y_row = y + (i * 25)
@@ -510,16 +522,15 @@ def food_planner_pdf():
 
         # Giorno
         pdf.set_font("Arial", "B", 12)
-        pdf.cell(col_width, row_height, d["day"], ln=True)
-        
-        # Dettagli pasti
+        pdf.cell(col_width, 6, day.capitalize(), ln=True)
+
+        # Pasti
         pdf.set_font("Arial", size=10)
         pdf.set_x(x)
-        pdf.multi_cell(col_width, 5, 
+        pdf.multi_cell(col_width, 5,
             f"Pranzo:\n"
             f"  Primo: {d['lunch_first']}\n"
-            f"  Secondo: {d['lunch_second']}\n"
-            f"\n"
+            f"  Secondo: {d['lunch_second']}\n\n"
             f"Cena:\n"
             f"  Primo: {d['dinner_first']}\n"
             f"  Secondo: {d['dinner_second']}"
