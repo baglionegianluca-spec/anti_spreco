@@ -481,10 +481,10 @@ def food_planner_pdf():
         pdf.cell(0, 8, day, ln=True)
         
         pdf.set_font("Arial", size=12)
-        pdf.cell(0, 7, f"- Pranzo (Primo): {meals['lunch_first'] or '—'}", ln=True)
-        pdf.cell(0, 7, f"- Pranzo (Secondo): {meals['lunch_second'] or '—'}", ln=True)
-        pdf.cell(0, 7, f"- Cena (Primo): {meals['dinner_first'] or '—'}", ln=True)
-        pdf.cell(0, 7, f"- Cena (Secondo): {meals['dinner_second'] or '—'}", ln=True)
+        pdf.cell(0, 7, f"- Pranzo (Primo): {meals['lunch_first'] or '-'}", ln=True)
+        pdf.cell(0, 7, f"- Pranzo (Secondo): {meals['lunch_second'] or '-'}", ln=True)
+        pdf.cell(0, 7, f"- Cena (Primo): {meals['dinner_first'] or '-'}", ln=True)
+        pdf.cell(0, 7, f"- Cena (Secondo): {meals['dinner_second'] or '-'}", ln=True)
         
         pdf.ln(4)
 
