@@ -498,11 +498,12 @@ def food_planner_pdf():
     pdf.cell(0, 14, "Meal Planner Settimanale", ln=True, align="C", fill=True)
     pdf.ln(4)
 
-    # === TABELLA COMPATTA ===
-    col_day = 30     # ridotto
-    col_lunch = 60   # ridotto
-    col_dinner = 60  # ridotto
-    row_height = 9   # riga compatta
+    # === TABELLA DEFINITIVA ===
+
+    col_day = 30
+    col_lunch = 70
+    col_dinner = 70
+    row_height = 10
 
     # Header colonne
     pdf.set_y(35)
@@ -515,39 +516,42 @@ def food_planner_pdf():
     pdf.set_font("Arial", size=9)
 
     toggle = False
+    y_start = 35 + row_height
 
     for day in days_order:
         d = week[day]
 
-        # Riga alternata colore neutro
+        # Colori riga alternata
         if toggle:
-            pdf.set_fill_color(245, 245, 245)
+            row_bg = (245, 245, 245)
         else:
-            pdf.set_fill_color(255, 255, 255)
+            row_bg = (255, 255, 255)
         toggle = not toggle
 
-        # Giorno
+        # === 1) SALVA POSIZIONE RIGA ===
+        row_y = y_start
+
+        # COLORE SFONDO RIGA
+        pdf.set_fill_color(*row_bg)
+
+        # === 2) Giorno ===
+        pdf.set_xy(10, row_y)
         pdf.cell(col_day, row_height, day.capitalize(), 1, 0, "C", True)
 
-        # --- PRANZO ---
-        x_lunch = pdf.get_x()
-        y_lunch = pdf.get_y()
-
+        # === 3) PRANZO ===
+        pdf.set_xy(10 + col_day, row_y)
         pdf.set_fill_color(220, 238, 255)  # celeste
-        pdf.multi_cell(col_lunch, row_height/2,
-            f"1º: {d['lunch_first']}\n2º: {d['lunch_second']}",
-            border=1, fill=True
-        )
+        lunch_text = f"1º: {d['lunch_first']}\n2º: {d['lunch_second']}"
+        pdf.multi_cell(col_lunch, row_height/2, lunch_text, border=1, fill=True)
 
-        # Torna accanto alla cella pranzo
-        pdf.set_xy(x_lunch + col_lunch, y_lunch)
-
-        # --- CENA ---
+        # === 4) CENA (ripartenza fissa) ===
+        pdf.set_xy(10 + col_day + col_lunch, row_y)
         pdf.set_fill_color(223, 255, 226)  # verde
-        pdf.multi_cell(col_dinner, row_height/2,
-            f"1º: {d['dinner_first']}\n2º: {d['dinner_second']}",
-            border=1, fill=True
-        )
+        dinner_text = f"1º: {d['dinner_first']}\n2º: {d['dinner_second']}"
+        pdf.multi_cell(col_dinner, row_height/2, dinner_text, border=1, fill=True)
+
+        # === 5) PASSA ALLA RIGA SUCCESSIVA ===
+        y_start += row_height
 
     # Output finale
     pdf_bytes = pdf.output(dest="S")
