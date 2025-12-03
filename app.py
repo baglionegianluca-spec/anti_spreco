@@ -513,10 +513,10 @@ def food_planner_pdf():
     for row in rows:
         d = row["day_date"]
         if d in week:
-            week[d]["lunch_first"] = row["lunch_first"] or "-"
-            week[d]["lunch_second"] = row["lunch_second"] or "-"
-            week[d]["dinner_first"] = row["dinner_first"] or "-"
-            week[d]["dinner_second"] = row["dinner_second"] or "-"
+            week[d]["lunch_first"] = strip_unsupported_chars(row["lunch_first"] or "-")
+            week[d]["lunch_second"] = strip_unsupported_chars(row["lunch_second"] or "-")
+            week[d]["dinner_first"] = strip_unsupported_chars(row["dinner_first"] or "-")
+            week[d]["dinner_second"] = strip_unsupported_chars(row["dinner_second"] or "-")
 
     # === PDF ===
     pdf = FPDF("P", "mm", "A4")
@@ -524,9 +524,9 @@ def food_planner_pdf():
     pdf.set_auto_page_break(False)
 
     # HEADER
-    pdf.set_fill_color(242, 242, 247)  # stile Apple
+    pdf.set_fill_color(242, 242, 247)
     pdf.set_font("Arial", "B", 18)
-    pdf.cell(0, 14, "Meal Planner Settimanale", ln=True, align="C", fill=True)
+    pdf.cell(0, 14, strip_unsupported_chars("Meal Planner Settimanale"), ln=True, align="C", fill=True)
     pdf.ln(4)
 
     # === TABELLA A PIENO FOGLIO ===
@@ -535,72 +535,68 @@ def food_planner_pdf():
     col_lunch = 75
     col_dinner = 75
 
-    # Altezza totale disponibile
     page_height = 297
     top_margin = 40
     bottom_margin = 10
     available_height = page_height - top_margin - bottom_margin
 
     rows = 7
-    row_height = available_height / rows  # ~ 35-36mm
+    row_height = available_height / rows
 
     # Header colonne
     pdf.set_y(top_margin - 10)
     pdf.set_font("Arial", "B", 12)
     pdf.set_fill_color(220, 220, 220)
-    pdf.cell(col_day, 10, "Giorno", 1, 0, "C", True)
-    pdf.cell(col_lunch, 10, "Pranzo", 1, 0, "C", True)
-    pdf.cell(col_dinner, 10, "Cena", 1, 1, "C", True)
+    pdf.cell(col_day, 10, strip_unsupported_chars("Giorno"), 1, 0, "C", True)
+    pdf.cell(col_lunch, 10, strip_unsupported_chars("Pranzo"), 1, 0, "C", True)
+    pdf.cell(col_dinner, 10, strip_unsupported_chars("Cena"), 1, 1, "C", True)
 
     pdf.set_font("Arial", size=10)
 
     y_start = top_margin
-
     toggle = False
 
     for day in days_order:
         d = week[day]
 
-        # Alternanza riga
-        if toggle:
-            row_bg = (245, 245, 245)
-        else:
-            row_bg = (255, 255, 255)
+        row_bg = (245, 245, 245) if toggle else (255, 255, 255)
         toggle = not toggle
 
-        # Memorizza Y della riga
         row_y = y_start
 
         # Giorno
         pdf.set_fill_color(*row_bg)
         pdf.set_xy(10, row_y)
-        pdf.cell(col_day, row_height, day.capitalize(), 1, 0, "C", True)
+        pdf.cell(
+            col_day,
+            row_height,
+            strip_unsupported_chars(day.capitalize()),
+            1,
+            0,
+            "C",
+            True
+        )
 
         # PRANZO
         pdf.set_fill_color(220, 238, 255)
         pdf.set_xy(10 + col_day, row_y)
-        pdf.multi_cell(col_lunch, row_height / 2,
-            f"1º: {d['lunch_first']}\n2º: {d['lunch_second']}",
-            border=1, fill=True
-        )
+        lunch_text = strip_unsupported_chars(f"1º: {d['lunch_first']}\n2º: {d['lunch_second']}")
+        pdf.multi_cell(col_lunch, row_height / 2, lunch_text, border=1, fill=True)
 
-        # Cena
+        # CENA
         pdf.set_fill_color(223, 255, 226)
         pdf.set_xy(10 + col_day + col_lunch, row_y)
-        pdf.multi_cell(col_dinner, row_height / 2,
-            f"1º: {d['dinner_first']}\n2º: {d['dinner_second']}",
-            border=1, fill=True
-        )
+        dinner_text = strip_unsupported_chars(f"1º: {d['dinner_first']}\n2º: {d['dinner_second']}")
+        pdf.multi_cell(col_dinner, row_height / 2, dinner_text, border=1, fill=True)
 
-        # Vai alla riga successiva
         y_start += row_height
 
-    # Output finale
     pdf_bytes = pdf.output(dest="S")
     return bytes(pdf_bytes), 200, {
         "Content-Type": "application/pdf",
         "Content-Disposition": "attachment; filename=meal_planner.pdf"
     }
+
 
 # ============================
 #   AGGIUNGI / MODIFICA PASTO
