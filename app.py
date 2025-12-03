@@ -451,7 +451,8 @@ def food_planner():
 @login_required
 def food_planner_pdf():
     conn = get_db()
-    cur = conn.cursor()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+
 
     # Recupera la settimana nell'ordine corretto
     days_order = ["lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"]
