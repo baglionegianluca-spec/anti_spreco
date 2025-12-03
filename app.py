@@ -455,9 +455,8 @@ def food_planner_pdf():
     conn = get_db()
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
-
-    # Recupera la settimana nell'ordine corretto
-    days_order = ["lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"]
+    days_order = ["lunedì", "martedì", "mercoledì", "giovedì",
+                  "venerdì", "sabato", "domenica"]
 
     cur.execute("""
         SELECT 
@@ -476,76 +475,78 @@ def food_planner_pdf():
     rows = cur.fetchall()
     conn.close()
 
-    # Dizionario giorno → pasti
-    week = {day: {"lunch_first": "-",
-                  "lunch_second": "-",
-                  "dinner_first": "-",
-                  "dinner_second": "-"} for day in days_order}
+    # Prepara dati
+    week = {d: {"lunch_first": "-", "lunch_second": "-", "dinner_first": "-", "dinner_second": "-"}
+            for d in days_order}
 
     for row in rows:
-        day = row["day_date"]
-        if day in week:
-            week[day]["lunch_first"] = row["lunch_first"] or "-"
-            week[day]["lunch_second"] = row["lunch_second"] or "-"
-            week[day]["dinner_first"] = row["dinner_first"] or "-"
-            week[day]["dinner_second"] = row["dinner_second"] or "-"
+        d = row["day_date"]
+        if d in week:
+            week[d]["lunch_first"] = row["lunch_first"] or "-"
+            week[d]["lunch_second"] = row["lunch_second"] or "-"
+            week[d]["dinner_first"] = row["dinner_first"] or "-"
+            week[d]["dinner_second"] = row["dinner_second"] or "-"
 
     # === PDF ===
-    pdf = FPDF(orientation="P", unit="mm", format="A4")
-    pdf.set_auto_page_break(auto=False)
+    pdf = FPDF("P", "mm", "A4")
     pdf.add_page()
+    pdf.set_auto_page_break(False)
 
-    pdf.set_margins(10, 10, 10)
-
-    # Titolo
+    # HEADER
+    pdf.set_fill_color(242, 242, 247)  # stile Apple
     pdf.set_font("Arial", "B", 18)
-    pdf.cell(0, 10, "Meal Planner Settimanale", ln=True, align="C")
-    pdf.ln(3)
+    pdf.cell(0, 14, "Meal Planner Settimanale", ln=True, align="C", fill=True)
+    pdf.ln(4)
 
-    # Tabella 2 colonne
-    pdf.set_font("Arial", size=11)
+    # TABella
+    col_day = 35
+    col_lunch = 75
+    col_dinner = 75
+    row_height = 12
 
-    col_width = 95
-    x_left = 10
-    x_right = 110
-    y = 25
+    # Header colonne
+    pdf.set_font("Arial", "B", 12)
+    pdf.set_fill_color(220, 220, 220)
+    pdf.cell(col_day, row_height, "Giorno", 1, 0, "C", True)
+    pdf.cell(col_lunch, row_height, "Pranzo", 1, 0, "C", True)
+    pdf.cell(col_dinner, row_height, "Cena", 1, 1, "C", True)
 
-    for i, day in enumerate(days_order):
+    pdf.set_font("Arial", size=10)
+
+    toggle = False
+
+    for day in days_order:
         d = week[day]
 
-        # Prima metà colonne
-        if i < 4:
-            x = x_left
-            y_row = y + (i * 25)
+        # Riga alternata
+        if toggle:
+            pdf.set_fill_color(245, 245, 245)
         else:
-            x = x_right
-            y_row = y + ((i - 4) * 25)
-
-        pdf.set_xy(x, y_row)
+            pdf.set_fill_color(255, 255, 255)
+        toggle = not toggle
 
         # Giorno
-        pdf.set_font("Arial", "B", 12)
-        pdf.cell(col_width, 6, day.capitalize(), ln=True)
+        pdf.cell(col_day, row_height, day.capitalize(), 1, 0, "C", True)
 
-        # Pasti
-        pdf.set_font("Arial", size=10)
-        pdf.set_x(x)
-        pdf.multi_cell(col_width, 5,
-            f"Pranzo:\n"
-            f"  Primo: {d['lunch_first']}\n"
-            f"  Secondo: {d['lunch_second']}\n\n"
-            f"Cena:\n"
-            f"  Primo: {d['dinner_first']}\n"
-            f"  Secondo: {d['dinner_second']}"
-        )
+        # Pranzo (azzurro)
+        pdf.set_fill_color(220, 238, 255)
+        lunch_text = f"1º: {d['lunch_first']}\n2º: {d['lunch_second']}"
+        pdf.multi_cell(col_lunch, row_height/2, lunch_text, border=1, align="L", fill=True, max_line_height=row_height/2)
+        
+        # ritorna a fianco
+        pdf.set_xy(pdf.get_x() + col_day + col_lunch - col_lunch, pdf.get_y())
 
-    # Output PDF
+        # Cena (verde chiaro)
+        pdf.set_fill_color(223, 255, 226)
+        dinner_text = f"1º: {d['dinner_first']}\n2º: {d['dinner_second']}"
+        pdf.multi_cell(col_dinner, row_height/2, dinner_text, border=1, align="L", fill=True, max_line_height=row_height/2)
+
+    # Output finale
     pdf_bytes = pdf.output(dest="S")
     return bytes(pdf_bytes), 200, {
         "Content-Type": "application/pdf",
         "Content-Disposition": "attachment; filename=meal_planner.pdf"
     }
-
 
 # ============================
 #   AGGIUNGI / MODIFICA PASTO
