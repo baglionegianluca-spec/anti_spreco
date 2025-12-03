@@ -5,6 +5,8 @@ from scheduler import setup_scheduler
 from db import get_db, add_product, get_all_products
 from dotenv import load_dotenv
 from fpdf import FPDF
+from psycopg2.extras import RealDictCursor
+
 
 # force redeploy 3.0
 
