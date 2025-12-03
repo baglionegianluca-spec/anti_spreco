@@ -450,50 +450,87 @@ def food_planner():
 @app.route("/food-planner/pdf")
 @login_required
 def food_planner_pdf():
-    days_query = ["lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"]
-    days_display = ["Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato","Domenica"]
+    conn = get_db()
+    cur = conn.cursor()
 
-    # Recupera i dati dal DB
-    week = {}
-    for i, day_db in enumerate(days_query):
-        day_plan = get_day_plan(day_db)
-        week[days_display[i]] = {
-            "lunch_first": day_plan.get("lunch_first_name") if day_plan else "",
-            "lunch_second": day_plan.get("lunch_second_name") if day_plan else "",
-            "dinner_first": day_plan.get("dinner_first_name") if day_plan else "",
-            "dinner_second": day_plan.get("dinner_second_name") if day_plan else "",
-        }
+    cur.execute("""
+        SELECT day, lunch_first, lunch_second, dinner_first, dinner_second
+        FROM meal_planner_week
+        ORDER BY sort_order
+    """)
+    
+    rows = cur.fetchall()
 
-    # ======== CREA IL PDF ========
-    pdf = FPDF()
+    # Organizza la settimana in lista
+    week = []
+    for row in rows:
+        week.append({
+            "day": row[0],
+            "lunch_first": row[1] or "-",
+            "lunch_second": row[2] or "-",
+            "dinner_first": row[3] or "-",
+            "dinner_second": row[4] or "-",
+        })
+
+    # === PDF ===
+    pdf = FPDF(orientation="P", unit="mm", format="A4")
+    pdf.set_auto_page_break(auto=False)
     pdf.add_page()
-    pdf.set_font("Arial", size=14)
 
-    pdf.set_text_color(0, 0, 0)
+    # Margini
+    pdf.set_margins(10, 10, 10)
+
+    # Titolo
     pdf.set_font("Arial", "B", 18)
-    pdf.cell(0, 10, "Planner Settimanale", ln=True, align="C")
-    pdf.ln(4)
+    pdf.cell(0, 10, "Meal Planner Settimanale", ln=True, align="C")
+    pdf.ln(3)
 
-    pdf.set_font("Arial", size=12)
+    # Font tabella
+    pdf.set_font("Arial", size=11)
 
-    for day, meals in week.items():
-        pdf.set_font("Arial", "B", 14)
-        pdf.cell(0, 8, day, ln=True)
+    # Due colonne: sinistra 100mm, destra 100mm
+    col_width = 95
+    row_height = 6
+
+    # Layout: 2 colonne × 4 righe
+    x_left = 10
+    x_right = 110
+    y = 25
+
+    for i, d in enumerate(week):
+        # scegli colonna
+        if i < 4:
+            x = x_left
+            y_row = y + (i * 25)
+        else:
+            x = x_right
+            y_row = y + ((i - 4) * 25)
+
+        pdf.set_xy(x, y_row)
+
+        # Giorno
+        pdf.set_font("Arial", "B", 12)
+        pdf.cell(col_width, row_height, d["day"], ln=True)
         
-        pdf.set_font("Arial", size=12)
-        pdf.cell(0, 7, f"- Pranzo (Primo): {meals['lunch_first'] or '-'}", ln=True)
-        pdf.cell(0, 7, f"- Pranzo (Secondo): {meals['lunch_second'] or '-'}", ln=True)
-        pdf.cell(0, 7, f"- Cena (Primo): {meals['dinner_first'] or '-'}", ln=True)
-        pdf.cell(0, 7, f"- Cena (Secondo): {meals['dinner_second'] or '-'}", ln=True)
-        
-        pdf.ln(4)
+        # Dettagli pasti
+        pdf.set_font("Arial", size=10)
+        pdf.set_x(x)
+        pdf.multi_cell(col_width, 5, 
+            f"Pranzo:\n"
+            f"  Primo: {d['lunch_first']}\n"
+            f"  Secondo: {d['lunch_second']}\n"
+            f"\n"
+            f"Cena:\n"
+            f"  Primo: {d['dinner_first']}\n"
+            f"  Secondo: {d['dinner_second']}"
+        )
 
     # Output PDF
-    return bytes(pdf.output(dest="S")), 200, {
+    pdf_bytes = pdf.output(dest="S")
+    return bytes(pdf_bytes), 200, {
         "Content-Type": "application/pdf",
-        "Content-Disposition": "attachment; filename=planner_settimanale.pdf"
+        "Content-Disposition": "attachment; filename=meal_planner.pdf"
     }
-
 
 
 # ============================
