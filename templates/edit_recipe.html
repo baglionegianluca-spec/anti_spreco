@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifica Ricetta</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+            background: #F2F2F7;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: auto;
+        }
+
+        label {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        input, textarea {
+            width: 100%;
+            margin-top: 8px;
+            padding: 12px;
+            font-size: 18px;
+            border-radius: 14px;
+            border: 1px solid #ccc;
+            font-family: inherit;
+        }
+
+        button {
+            width: 100%;
+            background: #34C759;
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 14px;
+            font-size: 18px;
+            margin-top: 20px;
+            font-weight: 700;
+        }
+
+        a.back-btn {
+            display: block;
+            text-align: center;
+            color: #007AFF;
+            margin-top: 20px;
+            font-size: 18px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+    <h1>Modifica Ricetta</h1>
+
+    <form method="POST">
+        <label>Nome Ricetta</label>
+        <input type="text" name="name" value="{{ recipe.name }}" required>
+
+        <label>Ingredienti</label>
+        <textarea name="notes" rows="10" required>{{ recipe.notes }}</textarea>
+
+        <button>💾 Salva modifiche</button>
+    </form>
+</div>
+
+<a href="/recipe/{{ recipe.id }}" class="back-btn">⬅️ Annulla</a>
+
+</body>
+</html>

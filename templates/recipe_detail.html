@@ -76,6 +76,26 @@
             background: #D1D1D6;
         }
 
+        .edit-btn {
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 12px 0;
+            margin-top: 15px;
+            background: #007AFF;
+            color: white;
+            font-size: 18px;
+            border-radius: 14px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .edit-btn:active {
+            background: #0062CC;
+        }
+
+
     </style>
 </head>
 
@@ -93,6 +113,8 @@
 </div>
 
 <a href="/recipes" class="back-btn">⬅️ Torna alle ricette</a>
+<a href="/recipe/{{ recipe.id }}/edit" class="edit-btn">✏️ Modifica ingredienti</a>
+
 
 <form method="POST" action="/recipe/{{ recipe.id }}/delete" 
       onsubmit="return confirm('Sei sicuro di voler eliminare questa ricetta?');">

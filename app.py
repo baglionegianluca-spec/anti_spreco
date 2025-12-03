@@ -654,6 +654,37 @@ def recipe_detail(recipe_id):
     return render_template("recipe_detail.html", recipe=recipe)
 
 
+# ============================
+#   MODIFICA RICETTA
+# ============================
+@app.route("/recipe/<int:recipe_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_recipe(recipe_id):
+    recipe = get_recipe(recipe_id)
+
+    if request.method == "POST":
+        new_name = request.form.get("name")
+        new_notes = request.form.get("notes")
+
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("""
+            UPDATE recipes
+            SET name = %s, notes = %s
+            WHERE id = %s
+        """, (new_name, new_notes, recipe_id))
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        return redirect(f"/recipe/{recipe_id}")
+
+    return render_template("edit_recipe.html", recipe=recipe)
+
+
+# ============================
+#   ELIMINA RICETTA
+# ============================
 
 @app.route("/recipe/<int:recipe_id>/delete", methods=["POST"])
 @login_required
