@@ -106,12 +106,28 @@ def add_recipe(name, ingredients):
 
 def get_recipe_by_id(recipe_id):
     conn = get_db()
-    cur = conn.cursor(cursor_factory=RealDictCursor)
-    cur.execute("SELECT * FROM recipes WHERE id = %s", (recipe_id,))
+    cur = conn.cursor()
+
+    # --- Ricetta base ---
+    cur.execute("""
+        SELECT id, name, notes, ingredients
+        FROM recipes
+        WHERE id = %s
+    """, (recipe_id,))
     row = cur.fetchone()
-    cur.close()
-    conn.close()
-    return row
+
+    if not row:
+        return None
+
+    recipe = {
+        "id": row[0],
+        "name": row[1],
+        "notes": row[2] or "",
+        "ingredients_structured": row[3] or []
+    }
+
+    return recipe
+
 
 
 def delete_recipe(recipe_id):

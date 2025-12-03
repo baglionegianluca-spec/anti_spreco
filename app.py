@@ -643,19 +643,8 @@ def add_recipe_route():
 @login_required
 def recipe_detail(recipe_id):
     recipe = get_recipe(recipe_id)
+    return render_template("recipe_detail.html", recipe=recipe)
 
-    # ingredienti testuali
-    notes = recipe.get("notes", "") or ""
-
-    # ingredienti strutturati
-    ingredients_list = recipe.get("ingredients", [])
-
-    return render_template(
-        "recipe_detail.html",
-        recipe=recipe,
-        notes=notes,
-        ingredients_list=ingredients_list
-    )
 
 
 @app.route("/recipe/<int:recipe_id>/delete", methods=["POST"])

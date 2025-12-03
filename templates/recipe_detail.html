@@ -47,10 +47,20 @@
 <div class="card">
     <h1>{{ recipe.name }}</h1>
 
-    <h2>Ingredienti:</h2>
-    <div class="ingredients">{{ ingredients }}</div>
+    <h2>Ingredienti</h2>
+    <div class="notes">
+        {{ recipe.notes | nl2br }}
+    </div>
 
-    <a class="back" href="/recipes">← Torna alle ricette</a>
+    {% if recipe.ingredients_structured %}
+    <h2>Ingredienti Strutturati</h2>
+    <ul>
+        {% for ing in recipe.ingredients_structured %}
+            <li>{{ ing.quantity }} {{ ing.unit }} {{ ing.ingredient_name }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
 </div>
 
 <form method="POST" action="/recipe/{{ recipe.id }}/delete" 
